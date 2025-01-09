@@ -6,7 +6,7 @@
 - 👥 Section-based organization with meeting schedules
 - 📊 Weekly planning tools with learning objectives
 - 📋 Detailed syllabus management
-- 🎓 Integration with Google Classroom
+
 
 ## 📊 Course Management
 - Create and manage multiple courses
