@@ -122,11 +122,13 @@ class AdminController {
         $registration = isset($_POST['registration_enabled']) ? 'true' : 'false';
         $maxNotes = $_POST['max_notes_per_user'] ?? '100';
         $maintenance = isset($_POST['maintenance_mode']) ? 'true' : 'false';
+        $showDeleteButtons = isset($_POST['show_delete_buttons']) ? 'true' : 'false';
         
         // Update settings
         $this->settingModel->set('registration_enabled', $registration);
         $this->settingModel->set('max_notes_per_user', $maxNotes);
         $this->settingModel->set('maintenance_mode', $maintenance);
+        $this->settingModel->set('show_delete_buttons', $showDeleteButtons);
         
         $_SESSION['success'] = 'Settings updated successfully';
         header('Location: /admin/dashboard');

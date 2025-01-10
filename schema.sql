@@ -89,7 +89,8 @@ CREATE TABLE learning_statements (
 INSERT INTO settings (setting_key, setting_value, description) VALUES
 ('registration_enabled', 'true', 'Allow new user registrations'),
 ('max_notes_per_user', '100', 'Maximum number of notes per user'),
-('maintenance_mode', 'false', 'Site maintenance mode'); 
+('maintenance_mode', 'false', 'Site maintenance mode'),
+('show_delete_buttons', 'false', 'Show delete buttons for courses and sections');
 
 ALTER TABLE notes ADD COLUMN section_id INT NOT NULL,
 ADD FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE; 
