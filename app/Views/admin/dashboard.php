@@ -189,17 +189,22 @@
                                                 <?php foreach ($sections as $section): ?>
                                                 <tr>
                                                     <td><?= htmlspecialchars($section['position']) ?></td>
-                                                    <td><?= htmlspecialchars($section['name']) ?></td>
+                                                    <td>
+                                                        <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes">
+                                                            <?= htmlspecialchars($section['name']) ?>
+                                                        </a>
+                                                    </td>
                                                     <td><?= htmlspecialchars($section['meeting_time'] ?? '') ?></td>
                                                     <td><?= htmlspecialchars($section['meeting_place'] ?? '') ?></td>
                                                     <td>
+                                                        <a href="/admin/sections/<?= $section['id'] ?>/notes/create" 
+                                                            class="btn btn-sm btn-success">New Daily Note</a>
                                                         <a href="/admin/sections/<?= $section['id'] ?>/edit" 
                                                            class="btn btn-sm btn-primary">Edit</a>
                                                         <a href="/admin/sections/<?= $section['id'] ?>/delete" 
                                                            class="btn btn-sm btn-danger"
                                                            onclick="return confirm('Are you sure you want to delete this section?')">Delete</a>
-                                                        <a href="/admin/sections/<?= $section['id'] ?>/notes/create" 
-                                                           class="btn btn-sm btn-success">New Daily Note</a>
+
                                                     </td>
                                                 </tr>
                                                 <?php endforeach; ?>
@@ -356,7 +361,11 @@
                                                             <tbody>
                                                                 <?php foreach ($sections as $section): ?>
                                                                 <tr>
-                                                                    <td><?= htmlspecialchars($section['name']) ?></td>
+                                                                    <td>
+                                                                        <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes">
+                                                                            <?= htmlspecialchars($section['name']) ?>
+                                                                        </a>
+                                                                    </td>
                                                                     <td><?= htmlspecialchars($section['meeting_time'] ?? '') ?></td>
                                                                     <td><?= htmlspecialchars($section['meeting_place'] ?? '') ?></td>
                                                                 </tr>

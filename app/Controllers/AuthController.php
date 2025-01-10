@@ -38,8 +38,12 @@ class AuthController {
             if ($user && password_verify($_POST['password'], $user['password'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_role'] = $user['role'];
-                Logger::log("Successful login for user: $email", 'SUCCESS');
-                header('Location: /dashboard');
+                
+                if ($user['role'] === 'admin') {
+                    header('Location: /admin/dashboard');
+                } else {
+                    header('Location: /dashboard');
+                }
                 exit;
             }
             

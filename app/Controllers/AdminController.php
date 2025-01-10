@@ -200,7 +200,7 @@ class AdminController {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             require ROOT_PATH . '/app/Views/admin/notes/create.php';
         } else {
-            error_log('POST data: ' . print_r($_POST, true), 3, '/var/log/apache2/error.log');
+            error_log('POST data: ' . print_r($_POST, true));
             $_POST['section_id'] = $sectionId;
             $_POST['user_id'] = $_SESSION['user_id'];
             

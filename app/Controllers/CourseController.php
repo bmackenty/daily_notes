@@ -6,6 +6,7 @@ use App\Models\AcademicYear;
 use App\Models\WeeklyPlan;
 use App\Models\Section;
 use App\Models\Note;
+use App\Models\Tag;
 
 class CourseController {
     private $db;
@@ -115,5 +116,20 @@ class CourseController {
         }
         
         require ROOT_PATH . '/app/Views/yearly_plans.php';
+    }
+
+    public function notesByTag($courseId, $tagName) {
+        $course = $this->courseModel->get($courseId);
+        if (!$course) {
+            $_SESSION['error'] = 'Course not found';
+            header('Location: /courses');
+            exit;
+        }
+
+        $tagModel = new Tag($this->db);
+        $notes = $tagModel->getNotesByTag($tagName, $courseId);
+        $tagCloud = $tagModel->getTagCloud($courseId);
+
+        require ROOT_PATH . '/app/Views/notes_by_tag.php';
     }
 } 

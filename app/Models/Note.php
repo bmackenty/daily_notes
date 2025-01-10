@@ -9,18 +9,42 @@ class Note {
     }
     
     public function create($data) {
-        $stmt = $this->db->prepare("
-            INSERT INTO notes (user_id, section_id, title, content, date)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        
-        return $stmt->execute([
-            $data['user_id'],
-            $data['section_id'],
-            $data['title'],
-            $data['content'],
-            $data['date']
-        ]);
+        $this->db->beginTransaction();
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO notes (user_id, section_id, title, content, date)
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            
+            $stmt->execute([
+                $data['user_id'],
+                $data['section_id'],
+                $data['title'],
+                $data['content'],
+                $data['date']
+            ]);
+            
+            $noteId = $this->db->lastInsertId();
+            
+            // Handle tag
+            if (!empty($data['title'])) {
+                $tagModel = new Tag($this->db);
+                $tagId = $tagModel->findOrCreate($data['title']);
+                
+                $stmt = $this->db->prepare("
+                    INSERT INTO note_tags (note_id, tag_id)
+                    VALUES (?, ?)
+                ");
+                $stmt->execute([$noteId, $tagId]);
+            }
+            
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            error_log($e->getMessage());
+            return false;
+        }
     }
     
     public function getAllBySection($sectionId) {
@@ -31,18 +55,45 @@ class Note {
     }
     
     public function update($id, $data) {
-        $sql = "UPDATE notes 
-                SET title = ?, content = ?, date = ?, 
-                    updated_at = CURRENT_TIMESTAMP 
-                WHERE id = ?";
+        $this->db->beginTransaction();
+        try {
+            $sql = "UPDATE notes 
+                    SET title = ?, content = ?, date = ?, 
+                        updated_at = CURRENT_TIMESTAMP 
+                    WHERE id = ?";
+                    
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                $data['title'],
+                $data['content'],
+                $data['date'],
+                $id
+            ]);
+
+            // Update tag
+            if (!empty($data['title'])) {
+                // Remove old tags
+                $stmt = $this->db->prepare("DELETE FROM note_tags WHERE note_id = ?");
+                $stmt->execute([$id]);
                 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            $data['title'],
-            $data['content'],
-            $data['date'],
-            $id
-        ]);
+                // Add new tag
+                $tagModel = new Tag($this->db);
+                $tagId = $tagModel->findOrCreate($data['title']);
+                
+                $stmt = $this->db->prepare("
+                    INSERT INTO note_tags (note_id, tag_id)
+                    VALUES (?, ?)
+                ");
+                $stmt->execute([$id, $tagId]);
+            }
+            
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            error_log($e->getMessage());
+            return false;
+        }
     }
     
     public function get($id) {

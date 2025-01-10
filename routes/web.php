@@ -229,6 +229,11 @@ switch ($request) {
         }
         break;
 
+    case (preg_match('/^\/courses\/(\d+)\/tags\/([^\/]+)$/', $request, $matches) ? true : false):
+        $controller = new CourseController($pdo);
+        $controller->notesByTag($matches[1], urldecode($matches[2]));
+        break;
+
     default:
         require ROOT_PATH . '/app/Views/404.php';
         break;

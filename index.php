@@ -22,6 +22,7 @@ require_once ROOT_PATH . '/app/Controllers/AuthController.php';
 require_once ROOT_PATH . '/app/Controllers/HomeController.php';
 require_once ROOT_PATH . '/app/Controllers/AdminController.php';
 require_once ROOT_PATH . '/app/Controllers/CourseController.php';
+require_once ROOT_PATH . '/app/Models/Tag.php';
 
 // Load router
 require_once ROOT_PATH . '/routes/web.php';

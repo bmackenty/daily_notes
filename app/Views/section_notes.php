@@ -50,24 +50,24 @@ function human_timing($timestamp) {
                         <div class="accordion" id="notesAccordion">
                             <?php foreach ($notes as $note): ?>
                                 <div class="accordion-item">
-                                    <h2 class="accordion-header">
+                                    <div class="d-flex justify-content-between align-items-center p-3">
                                         <button class="accordion-button collapsed" type="button" 
                                                 data-bs-toggle="collapse" 
-                                                data-bs-target="#note<?= $note['id'] ?>">
-                                            <div class="d-flex justify-content-between align-items-center w-100 me-3">
-                                                <span>
-                                                    <i class="bi bi-journal-text text-primary me-2"></i>
-                                                    <?= date('F j, Y', strtotime($note['date'])) ?>
-                                                    <span class="text-muted">
-                                                        (<?= human_timing(strtotime($note['date'])) ?>)
-                                                    </span>
-                                                </span>
-                                                <span class="btn btn-outline-primary btn-sm">
-                                                    <i class="bi bi-tag"></i> Topic: <?= htmlspecialchars($note['title']) ?>
-                                                </span>
-                                            </div>
+                                                data-bs-target="#note<?= $note['id'] ?>"
+                                                style="width: auto;">
+                                            <i class="bi bi-journal-text text-primary me-2"></i>
+                                            <?= date('F j, Y', strtotime($note['date'])) ?>
+                                            <span class="text-muted ms-2">
+                                                (<?= human_timing(strtotime($note['date'])) ?>)
+                                            </span>
                                         </button>
-                                    </h2>
+                                        
+                                        <a href="/courses/<?= $course['id'] ?>/tags/<?= urlencode($note['title']) ?>" 
+                                           class="btn btn-outline-primary btn-sm ms-2">
+                                            <i class="bi bi-tag"></i> Topic: <?= htmlspecialchars($note['title']) ?>
+                                        </a>
+                                    </div>
+
                                     <div id="note<?= $note['id'] ?>" class="accordion-collapse collapse" 
                                          data-bs-parent="#notesAccordion">
                                         <div class="accordion-body">
