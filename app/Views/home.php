@@ -49,7 +49,7 @@
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-person-circle text-secondary me-2"></i>
                                 <?php if (!empty($course['teacher_profile_id'])): ?>
-                                    <a href="#" onclick="viewTeacherProfile(<?= $course['teacher_profile_id'] ?>); return false;">
+                                    <a href="/teacher-profile/<?= $course['teacher_profile_id'] ?>">
                                         <?= htmlspecialchars($course['teacher']) ?>
                                     </a>
                                 <?php else: ?>
@@ -141,5 +141,4 @@
     </section>
 </div>
 
-<?php require ROOT_PATH . '/app/Views/partials/teacher_profile_modal.php'; ?>
 <?php require ROOT_PATH . '/app/Views/partials/footer.php'; ?>

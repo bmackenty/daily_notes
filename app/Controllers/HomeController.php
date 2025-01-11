@@ -6,12 +6,13 @@ use App\Models\Section;
 use App\Models\Note;
 
 class HomeController {
+    private $pdo;
     private $courseModel;
     private $sectionModel;
     private $noteModel;
 
-    public function __construct() {
-        global $pdo;
+    public function __construct($pdo) {
+        $this->pdo = $pdo;
         $this->courseModel = new Course($pdo);
         $this->sectionModel = new Section($pdo);
         $this->noteModel = new Note($pdo);
@@ -44,5 +45,20 @@ class HomeController {
         
         $sections = $this->sectionModel->getAllByCourse($courseId);
         require ROOT_PATH . '/app/Views/syllabus.php';
+    }
+
+    public function teacherProfile($id) {
+        $teacherProfileModel = new \App\Models\TeacherProfile($this->pdo);
+        $profile = $teacherProfileModel->get($id);
+        
+        if (!$profile) {
+            header('Location: /');
+            exit;
+        }
+        
+        // Get courses taught by this teacher
+        $courses = $this->courseModel->getCoursesByTeacherProfileId($id);
+        
+        require ROOT_PATH . '/app/Views/teacher_profile.php';
     }
 } 

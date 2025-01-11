@@ -3,8 +3,18 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Define root path
+// Define root path and error log path
 define('ROOT_PATH', __DIR__);
+define('ERROR_LOG_PATH', ROOT_PATH . '/logs/error.log');
+
+// Create logs directory if it doesn't exist
+if (!file_exists(ROOT_PATH . '/logs')) {
+    mkdir(ROOT_PATH . '/logs', 0755, true);
+}
+
+// Set error log location
+ini_set('error_log', ERROR_LOG_PATH);
+ini_set('log_errors', 1);
 
 // Load database connection
 require_once ROOT_PATH . '/config/database.php';

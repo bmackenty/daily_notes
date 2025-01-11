@@ -25,7 +25,7 @@ if ($maintenanceMode && !in_array($request, $allowedRoutes) &&
 switch ($request) {
 
     case '/':
-        (new HomeController())->index();
+        (new HomeController($pdo))->index();
         break;
         
     case '/login':
@@ -147,7 +147,7 @@ switch ($request) {
         break;
 
     case (preg_match('/^\/syllabus\/(\d+)$/', $request, $matches) ? true : false):
-        $controller = new HomeController();
+        $controller = new HomeController($pdo);
         $controller->syllabus($matches[1]);
         break;
 
@@ -271,6 +271,11 @@ switch ($request) {
     case (preg_match('/^\/api\/teacher-profiles\/(\d+)$/', $request, $matches) ? true : false):
         $controller = new AdminController($pdo);
         $controller->getTeacherProfile($matches[1]);
+        break;
+
+    case (preg_match('/^\/teacher-profile\/(\d+)$/', $request, $matches) ? true : false):
+        $controller = new HomeController($pdo);
+        $controller->teacherProfile($matches[1]);
         break;
 
     default:
