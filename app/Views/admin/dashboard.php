@@ -21,6 +21,9 @@
                 <li class="nav-item">
                     <a class="nav-link" id="sections-tab" data-bs-toggle="tab" href="#sections">Course Sections</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="teacher-profiles-tab" data-bs-toggle="tab" href="#teacher-profiles">Teacher Profiles</a>
+                </li>
             </ul>
 
             <div class="tab-content" id="dashboardContent">
@@ -389,6 +392,58 @@
                                                     <?php else: ?>
                                                         <em class="text-muted">No sections</em>
                                                     <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Profiles Tab -->
+                <div class="tab-pane fade" id="teacher-profiles">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Teacher Profiles</h2>
+                        <a href="/admin/teacher-profiles/create" class="btn btn-primary">Add New Profile</a>
+                    </div>
+
+                    <?php if (isset($_SESSION['success'])): ?>
+                        <div class="alert alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                    <?php endif; ?>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Title</th>
+                                            <th>Email</th>
+                                            <th>Linked Courses</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($teacherProfiles as $profile): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($profile['full_name']) ?></td>
+                                                <td><?= htmlspecialchars($profile['title']) ?></td>
+                                                <td><?= htmlspecialchars($profile['email']) ?></td>
+                                                <td><?= count($profileCourses[$profile['id']] ?? []) ?> courses</td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a href="/admin/teacher-profiles/<?= $profile['id'] ?>/edit" 
+                                                           class="btn btn-sm btn-primary">Edit</a>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-info"
+                                                                onclick="viewTeacherProfile(<?= $profile['id'] ?>)">View</button>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-danger"
+                                                                onclick="deleteTeacherProfile(<?= $profile['id'] ?>)">Delete</button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

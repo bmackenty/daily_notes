@@ -29,15 +29,9 @@ class WeeklyPlan {
     }
 
     public function getByCourse($courseId) {
-        $sql = "SELECT DISTINCT cwp.*, aw.week_number, aw.start_date, aw.end_date 
-                FROM course_weekly_plans cwp
-                JOIN academic_weeks aw ON cwp.academic_week_id = aw.id
-                WHERE cwp.course_id = :course_id
-                ORDER BY aw.week_number ASC";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['course_id' => $courseId]);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt = $this->db->prepare("SELECT * FROM course_weekly_plans WHERE course_id = ?");
+        $stmt->execute([$courseId]);
+        return $stmt->fetchAll();
     }
 
     public function update($id, $data) {

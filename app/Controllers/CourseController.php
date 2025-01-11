@@ -132,4 +132,32 @@ class CourseController {
 
         require ROOT_PATH . '/app/Views/notes_by_tag.php';
     }
+
+    public function singleNote($courseId, $sectionId, $noteId) {
+        $course = $this->courseModel->get($courseId);
+        $section = $this->sectionModel->get($sectionId);
+        $note = $this->noteModel->get($noteId);
+        
+        if (!$course || !$section || !$note) {
+            $_SESSION['error'] = 'Note not found';
+            header('Location: /courses/' . $courseId . '/sections/' . $sectionId . '/notes');
+            exit;
+        }
+        
+        require ROOT_PATH . '/app/Views/single_note.php';
+    }
+
+    public function show($courseId) {
+        $course = $this->courseModel->get($courseId);
+        
+        if (!$course) {
+            $_SESSION['error'] = 'Course not found';
+            header('Location: /courses');
+            exit;
+        }
+        
+        $sections = $this->sectionModel->getAllByCourse($courseId);
+        require ROOT_PATH . '/app/Views/courses/show.php';
+    }
 } 
+

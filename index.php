@@ -18,6 +18,7 @@ require_once ROOT_PATH . '/app/Models/Section.php';
 require_once ROOT_PATH . '/app/Models/Note.php';
 require_once ROOT_PATH . '/app/Models/AcademicYear.php';
 require_once ROOT_PATH . '/app/Models/WeeklyPlan.php';
+require_once ROOT_PATH . '/app/Models/TeacherProfile.php';
 require_once ROOT_PATH . '/app/Controllers/AuthController.php';
 require_once ROOT_PATH . '/app/Controllers/HomeController.php';
 require_once ROOT_PATH . '/app/Controllers/AdminController.php';

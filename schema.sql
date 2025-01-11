@@ -10,15 +10,13 @@ CREATE TABLE users (
 );
 
 CREATE TABLE notes (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     section_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
+    content TEXT,
     date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
 );
 
@@ -51,20 +49,18 @@ CREATE TABLE courses (
     name VARCHAR(255) NOT NULL,
     short_name VARCHAR(50) NOT NULL,
     description TEXT,
-    aims TEXT,
-    assessment TEXT,
-    required TEXT,
-    communication TEXT,
     policies TEXT,
     rules TEXT,
     academic_integrity TEXT,
     prerequisites TEXT,
-    teacher TEXT,
+    teacher VARCHAR(255),
+    teacher_profile_id INT,
     google_classroom_link VARCHAR(255),
     meeting_notes TEXT,
     default_tags TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_profile_id) REFERENCES teacher_profiles(id)
 );
 
 CREATE TABLE sections (
@@ -83,6 +79,31 @@ CREATE TABLE learning_statements (
     id INT AUTO_INCREMENT PRIMARY KEY,
     identifier TEXT,
     learning_statement TEXT
+);
+
+CREATE TABLE teacher_profiles (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    full_name VARCHAR(255) NOT NULL,
+    title VARCHAR(255),
+    email VARCHAR(255),
+    office_hours TEXT,
+    biography TEXT,
+    education TEXT,
+    profile_picture VARCHAR(255),
+    contact_preferences TEXT,
+    expertise TEXT,
+    teaching_philosophy TEXT,
+    personal_interests TEXT,
+    achievements TEXT,
+    vision_for_students TEXT,
+    fun_facts TEXT,
+    social_media_links TEXT,
+    github_link VARCHAR(255),
+    personal_webpage VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- Insert default settings

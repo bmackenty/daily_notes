@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.60] - 2025-01-11
+### Added
+- Teacher profile system with modal view
+- Linked teachers to courses with profile information
+- Added teacher profile management in admin dashboard
+- Added profile picture support for teacher profiles
+- Added detailed teacher information display (education, contact info, etc.)
+
+### Changed
+- Updated course form to include teacher profile selection
+- Modified teacher display in course listings to show profile modal
+- Enhanced teacher information display throughout the application
+
+### Technical
+- Added new JavaScript module for handling teacher profile interactions
+- Implemented API endpoint for fetching teacher profile data
+- Added profile picture upload and management functionality
+
 ## [0.5.0] - 2024-03-19
 ### Added
 - Folksonomy tagging system for daily notes

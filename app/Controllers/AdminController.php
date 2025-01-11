@@ -9,6 +9,7 @@ use App\Utils\Logger;
 use App\Models\AcademicYear;
 use App\Models\WeeklyPlan;
 use DateTime;
+use App\Models\TeacherProfile;
 
 class AdminController {
     private $settingModel;
@@ -16,6 +17,7 @@ class AdminController {
     private $sectionModel;
     private $noteModel;
     private $db;
+    private $teacherProfileModel;
     
     public function __construct($db) {
         if (session_status() === PHP_SESSION_NONE) {
@@ -34,6 +36,7 @@ class AdminController {
         $this->courseModel = new Course($db);
         $this->sectionModel = new Section($db);
         $this->noteModel = new Note($db);
+        $this->teacherProfileModel = new TeacherProfile($db);
     }
     
     public function dashboard() {
@@ -62,6 +65,13 @@ class AdminController {
             }
         }
         
+        // Get teacher profiles and their associated courses
+        $teacherProfiles = $this->teacherProfileModel->getAll();
+        $profileCourses = [];
+        foreach ($teacherProfiles as $profile) {
+            $profileCourses[$profile['id']] = $this->courseModel->getCoursesByTeacherProfileId($profile['id']);
+        }
+
         require ROOT_PATH . '/app/Views/admin/dashboard.php';
     }
 
@@ -73,6 +83,7 @@ class AdminController {
 
     public function createCourse() {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $teacherProfiles = $this->teacherProfileModel->getAll();
             require ROOT_PATH . '/app/Views/admin/courses/create.php';
         } else {
             if ($this->courseModel->create($_POST)) {
@@ -90,6 +101,7 @@ class AdminController {
     public function editCourse($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $course = $this->courseModel->get($id);
+            $teacherProfiles = $this->teacherProfileModel->getAll();
             require ROOT_PATH . '/app/Views/admin/courses/edit.php';
         } else {
             if ($this->courseModel->update($id, $_POST)) {
@@ -459,6 +471,88 @@ class AdminController {
         }
 
         header('Location: /courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes');
+        exit;
+    }
+
+    public function createTeacherProfile() {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            require ROOT_PATH . '/app/Views/admin/teacher_profiles/create.php';
+        } else {
+            $data = $_POST;
+            
+            // Handle profile picture upload
+            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
+                $uploadDir = ROOT_PATH . '/public/uploads/profile_pictures/';
+                $fileName = uniqid() . '_' . basename($_FILES['profile_picture']['name']);
+                $uploadFile = $uploadDir . $fileName;
+                
+                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $uploadFile)) {
+                    $data['profile_picture'] = '/uploads/profile_pictures/' . $fileName;
+                }
+            }
+
+            if ($this->teacherProfileModel->create($data)) {
+                Logger::log("Teacher profile created: {$data['full_name']}", 'INFO');
+                $_SESSION['success'] = 'Teacher profile created successfully';
+            } else {
+                Logger::log("Failed to create teacher profile: {$data['full_name']}", 'ERROR');
+                $_SESSION['error'] = 'Failed to create teacher profile';
+            }
+            header('Location: /admin/dashboard#teacher-profiles');
+            exit;
+        }
+    }
+
+    public function editTeacherProfile($id) {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $profile = $this->teacherProfileModel->get($id);
+            require ROOT_PATH . '/app/Views/admin/teacher_profiles/edit.php';
+        } else {
+            $data = $_POST;
+            
+            // Handle profile picture upload
+            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
+                $uploadDir = ROOT_PATH . '/public/uploads/profile_pictures/';
+                $fileName = uniqid() . '_' . basename($_FILES['profile_picture']['name']);
+                $uploadFile = $uploadDir . $fileName;
+                
+                if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $uploadFile)) {
+                    $data['profile_picture'] = '/uploads/profile_pictures/' . $fileName;
+                }
+            }
+
+            if ($this->teacherProfileModel->update($id, $data)) {
+                Logger::log("Teacher profile updated: {$data['full_name']} (ID: $id)", 'INFO');
+                $_SESSION['success'] = 'Teacher profile updated successfully';
+            } else {
+                Logger::log("Failed to update teacher profile ID: $id", 'ERROR');
+                $_SESSION['error'] = 'Failed to update teacher profile';
+            }
+            header('Location: /admin/dashboard#teacher-profiles');
+            exit;
+        }
+    }
+
+    public function deleteTeacherProfile($id) {
+        $profile = $this->teacherProfileModel->get($id);
+        if ($this->teacherProfileModel->delete($id)) {
+            Logger::log("Teacher profile deleted: {$profile['full_name']} (ID: $id)", 'INFO');
+            return json_encode(['success' => true]);
+        } else {
+            Logger::log("Failed to delete teacher profile ID: $id", 'ERROR');
+            return json_encode(['success' => false]);
+        }
+    }
+
+    public function getTeacherProfile($id) {
+        $profile = $this->teacherProfileModel->get($id);
+        if ($profile) {
+            header('Content-Type: application/json');
+            echo json_encode($profile);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Profile not found']);
+        }
         exit;
     }
 } 

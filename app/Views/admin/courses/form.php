@@ -58,7 +58,17 @@
 
     <div class="mb-3">
         <label>Teacher</label>
-        <input type="text" name="teacher" class="form-control" required 
+        <select name="teacher_profile_id" class="form-control" required onchange="updateTeacherName(this)">
+            <option value="">Select a Teacher</option>
+            <?php foreach ($teacherProfiles as $profile): ?>
+                <option value="<?= $profile['id'] ?>" 
+                    data-teacher-name="<?= htmlspecialchars($profile['full_name']) ?>"
+                    <?= (isset($course) && $course['teacher_profile_id'] == $profile['id']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($profile['full_name']) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <input type="hidden" name="teacher" id="teacher_name" 
                value="<?= isset($course) ? htmlspecialchars($course['teacher']) : '' ?>">
     </div>
 
@@ -77,3 +87,19 @@
     <button type="submit" class="btn btn-primary">Save Course</button>
     <a href="/admin/courses" class="btn btn-secondary">Cancel</a>
 </form>
+
+<script>
+function updateTeacherName(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    const teacherName = selectedOption.getAttribute('data-teacher-name');
+    document.getElementById('teacher_name').value = teacherName || '';
+}
+
+// Set initial teacher name if editing
+document.addEventListener('DOMContentLoaded', function() {
+    const select = document.querySelector('select[name="teacher_profile_id"]');
+    if (select) {
+        updateTeacherName(select);
+    }
+});
+</script>

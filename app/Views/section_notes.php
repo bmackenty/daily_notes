@@ -47,58 +47,18 @@ function human_timing($timestamp) {
                             No daily notes have been added for this section yet.
                         </div>
                     <?php else: ?>
-                        <div class="accordion" id="notesAccordion">
+                        <div class="list-group">
                             <?php foreach ($notes as $note): ?>
-                                <div class="accordion-item">
-                                    <div class="d-flex justify-content-between align-items-center p-3">
-                                        <button class="accordion-button collapsed" type="button" 
-                                                data-bs-toggle="collapse" 
-                                                data-bs-target="#note<?= $note['id'] ?>"
-                                                style="width: auto;">
-                                            <i class="bi bi-journal-text text-primary me-2"></i>
-                                            <?= date('F j, Y', strtotime($note['date'])) ?>
-                                            <span class="text-muted ms-2">
-                                                (<?= human_timing(strtotime($note['date'])) ?>)
-                                            </span>
-                                        </button>
-                                        
-                                        <a href="/courses/<?= $course['id'] ?>/tags/<?= urlencode($note['title']) ?>" 
-                                           class="btn btn-outline-primary btn-sm ms-2">
-                                            <i class="bi bi-tag"></i> Topic: <?= htmlspecialchars($note['title']) ?>
-                                        </a>
+                                <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes/<?= $note['id'] ?>" 
+                                   class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-journal-text text-primary me-2"></i>
+                                        <?= date('l, F j, Y', strtotime($note['date'])) ?>
+                                        <span class="text-muted ms-2">
+                                            (<?= human_timing(strtotime($note['date'])) ?>)
+                                        </span>
                                     </div>
-
-                                    <div id="note<?= $note['id'] ?>" class="accordion-collapse collapse" 
-                                         data-bs-parent="#notesAccordion">
-                                        <div class="accordion-body">
-                                            <div class="mb-3">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <h5 class="h6">Our notes for today:</h5>
-                                                    <?php if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'admin'): ?>
-                                                        <a href="/admin/notes/<?= $note['id'] ?>/edit" class="btn btn-sm btn-primary">
-                                                            <i class="bi bi-pencil"></i> Edit Note
-                                                        </a>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <div class="mb-3"><?= $note['content'] ?></div>
-                                            </div>
-                                            
-                                            <?php if (!empty($note['homework'])): ?>
-                                                <div class="mb-3">
-                                                    <h5 class="h6">Homework</h5>
-                                                    <div class="mb-3"><?= $note['homework'] ?></div>
-                                                </div>
-                                            <?php endif; ?>
-
-                                            <?php if (!empty($note['resources'])): ?>
-                                                <div>
-                                                    <h5 class="h6">Resources</h5>
-                                                    <div><?= $note['resources'] ?></div>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
+                                </a>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>

@@ -20,28 +20,21 @@ class Course {
     }
     
     public function create($data) {
-        $stmt = $this->db->prepare("
-            INSERT INTO courses (
-                name, short_name, description, aims, assessment,
-                required, communication, policies, rules,
-                academic_integrity, prerequisites, teacher,
-                google_classroom_link, meeting_notes, default_tags
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
+        $sql = "INSERT INTO courses (name, short_name, description, policies, rules, 
+                academic_integrity, prerequisites, teacher, teacher_profile_id, google_classroom_link, 
+                meeting_notes, default_tags) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
-        return $stmt->execute([
+        return $this->db->prepare($sql)->execute([
             $data['name'],
             $data['short_name'],
             $data['description'],
-            $data['aims'],
-            $data['assessment'],
-            $data['required'],
-            $data['communication'],
             $data['policies'],
             $data['rules'],
             $data['academic_integrity'],
             $data['prerequisites'],
             $data['teacher'],
+            $data['teacher_profile_id'],
             $data['google_classroom_link'],
             $data['meeting_notes'],
             $data['default_tags']
@@ -49,31 +42,23 @@ class Course {
     }
     
     public function update($id, $data) {
-        $stmt = $this->db->prepare("
-            UPDATE courses SET 
-                name = ?, short_name = ?, description = ?,
-                aims = ?, assessment = ?, required = ?,
-                communication = ?, policies = ?, rules = ?,
-                academic_integrity = ?, prerequisites = ?,
-                teacher = ?, google_classroom_link = ?,
-                meeting_notes = ?, default_tags = ?,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        ");
+        $sql = "UPDATE courses SET 
+                name = ?, short_name = ?, description = ?, policies = ?, 
+                rules = ?, academic_integrity = ?, prerequisites = ?, 
+                teacher = ?, teacher_profile_id = ?, google_classroom_link = ?, 
+                meeting_notes = ?, default_tags = ? 
+                WHERE id = ?";
         
-        return $stmt->execute([
+        return $this->db->prepare($sql)->execute([
             $data['name'],
             $data['short_name'],
             $data['description'],
-            $data['aims'],
-            $data['assessment'],
-            $data['required'],
-            $data['communication'],
             $data['policies'],
             $data['rules'],
             $data['academic_integrity'],
             $data['prerequisites'],
             $data['teacher'],
+            $data['teacher_profile_id'],
             $data['google_classroom_link'],
             $data['meeting_notes'],
             $data['default_tags'],
@@ -91,5 +76,12 @@ class Course {
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$id]);
         return $stmt->fetch();
+    }
+    
+    public function getCoursesByTeacherProfileId($profileId) {
+        $sql = "SELECT * FROM courses WHERE teacher_profile_id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$profileId]);
+        return $stmt->fetchAll();
     }
 } 

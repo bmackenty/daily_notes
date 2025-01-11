@@ -48,7 +48,13 @@
                         <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-person-circle text-secondary me-2"></i>
-                                <span><?= htmlspecialchars($course['teacher']) ?></span>
+                                <?php if (!empty($course['teacher_profile_id'])): ?>
+                                    <a href="#" onclick="viewTeacherProfile(<?= $course['teacher_profile_id'] ?>); return false;">
+                                        <?= htmlspecialchars($course['teacher']) ?>
+                                    </a>
+                                <?php else: ?>
+                                    <?= htmlspecialchars($course['teacher']) ?>
+                                <?php endif; ?>
                             </div>
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-collection text-info me-2"></i>
@@ -135,4 +141,5 @@
     </section>
 </div>
 
+<?php require ROOT_PATH . '/app/Views/partials/teacher_profile_modal.php'; ?>
 <?php require ROOT_PATH . '/app/Views/partials/footer.php'; ?>

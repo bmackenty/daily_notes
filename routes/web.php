@@ -234,6 +234,45 @@ switch ($request) {
         $controller->notesByTag($matches[1], urldecode($matches[2]));
         break;
 
+    case (preg_match('/^\/courses\/(\d+)\/sections\/(\d+)\/notes\/(\d+)$/', $request, $matches) ? true : false):
+        $controller = new CourseController($pdo);
+        $controller->singleNote($matches[1], $matches[2], $matches[3]);
+        break;
+
+    case (preg_match('/^\/courses\/(\d+)$/', $request, $matches) ? true : false):
+        $controller = new CourseController($pdo);
+        $controller->show($matches[1]);
+        break;
+
+    // Teacher Profile routes
+    case '/admin/teacher-profiles/create':
+        $controller = new AdminController($pdo);
+        if ($request_method === 'GET') {
+            $controller->createTeacherProfile();
+        } else {
+            $controller->createTeacherProfile();
+        }
+        break;
+
+    case (preg_match('/^\/admin\/teacher-profiles\/(\d+)\/edit$/', $request, $matches) ? true : false):
+        $controller = new AdminController($pdo);
+        if ($request_method === 'GET') {
+            $controller->editTeacherProfile($matches[1]);
+        } else {
+            $controller->editTeacherProfile($matches[1]);
+        }
+        break;
+
+    case (preg_match('/^\/admin\/teacher-profiles\/(\d+)\/delete$/', $request, $matches) ? true : false):
+        $controller = new AdminController($pdo);
+        echo $controller->deleteTeacherProfile($matches[1]);
+        break;
+
+    case (preg_match('/^\/api\/teacher-profiles\/(\d+)$/', $request, $matches) ? true : false):
+        $controller = new AdminController($pdo);
+        $controller->getTeacherProfile($matches[1]);
+        break;
+
     default:
         require ROOT_PATH . '/app/Views/404.php';
         break;
