@@ -35,9 +35,7 @@ $activeYear = $academicYearModel->getActive();
                                 <a class="nav-link" href="/admin/dashboard">Admin</a>
                             </li>
                         <?php endif; ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/dashboard">Dashboard</a>
-                        </li>
+                   
                         <li class="nav-item">
                             <a class="nav-link" href="/logout">Logout</a>
                         </li>

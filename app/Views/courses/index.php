@@ -22,7 +22,13 @@
                             <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-person-circle text-secondary me-2"></i>
-                                    <span><?= htmlspecialchars($course['teacher']) ?></span>
+                                    <?php if (!empty($course['teacher_profile_id'])): ?>
+                                        <a href="/teacher-profile/<?= $course['teacher_profile_id'] ?>">
+                                            <?= htmlspecialchars($course['teacher']) ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <?= htmlspecialchars($course['teacher']) ?>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-collection text-info me-2"></i>

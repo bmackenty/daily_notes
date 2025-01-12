@@ -78,6 +78,10 @@ class AdminController {
     public function courses() {
         $courses = $this->courseModel->getAll();
         $sectionModel = $this->sectionModel;
+        $sections = [];
+        foreach ($courses as $course) {
+            $sections[$course['id']] = $sectionModel->getAllByCourse($course['id']);
+        }
         require ROOT_PATH . '/app/Views/admin/courses/index.php';
     }
 
@@ -150,6 +154,7 @@ class AdminController {
     public function sections($courseId) {
         $course = $this->courseModel->get($courseId);
         $sections = $this->sectionModel->getAllByCourse($courseId);
+        $settings = $this->settingModel->getAll();
         require ROOT_PATH . '/app/Views/admin/sections/index.php';
     }
 

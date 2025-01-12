@@ -50,6 +50,23 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Sections</h5>
+                                    <p class="card-text">
+                                        <?php
+                                        $totalSections = 0;
+                                        foreach ($courses as $course) {
+                                            $sections = $sectionModel->getAllByCourse($course['id']);
+                                            $totalSections += count($sections);
+                                        }
+                                        echo $totalSections . ' sections';
+                                        ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -320,13 +337,12 @@
                                         <input type="checkbox" class="form-check-input" id="registration" 
                                                name="registration_enabled" <?= $settings['registration_enabled'] === 'true' ? 'checked' : '' ?>>
                                         <label class="form-check-label" for="registration">Enable Registration</label>
+                                        <small class="form-text text-muted d-block">
+                                           This will enable the registration feature on the navigation bar. In general, this system is designed to be used by one or two teachers. 
+                                        </small>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label>Max Notes Per User</label>
-                                    <input type="number" class="form-control" name="max_notes_per_user" 
-                                           value="<?= htmlspecialchars($settings['max_notes_per_user']) ?>">
-                                </div>
+                          
                                 <div class="mb-3">
                                     <div class="form-check form-switch">
                                         <input type="checkbox" class="form-check-input" id="deleteButtons" 
@@ -440,9 +456,11 @@
                                                         <button type="button" 
                                                                 class="btn btn-sm btn-info"
                                                                 onclick="viewTeacherProfile(<?= $profile['id'] ?>)">View</button>
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-danger"
-                                                                onclick="deleteTeacherProfile(<?= $profile['id'] ?>)">Delete</button>
+                                                        <?php if ($settings['show_delete_buttons'] === 'true'): ?>
+                                                            <button type="button" 
+                                                                    class="btn btn-sm btn-danger"
+                                                                    onclick="deleteTeacherProfile(<?= $profile['id'] ?>)">Delete</button>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </td>
                                             </tr>

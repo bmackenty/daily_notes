@@ -94,9 +94,17 @@
                             <div class="mb-3">
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="bi bi-person-circle text-primary me-2"></i>
-                                    <strong>Teacher</strong>
+                                    <strong>Instructor</strong>
                                 </div>
-                                <p class="ms-4 mb-0"><?= htmlspecialchars($course['teacher']) ?></p>
+                                <p class="ms-4 mb-0">
+                                    <?php if (!empty($course['teacher_profile_id'])): ?>
+                                        <a href="/teacher-profile/<?= $course['teacher_profile_id'] ?>">
+                                            <?= htmlspecialchars($course['teacher']) ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <?= htmlspecialchars($course['teacher']) ?>
+                                    <?php endif; ?>
+                                </p>
                             </div>
 
                             <div class="mb-3">

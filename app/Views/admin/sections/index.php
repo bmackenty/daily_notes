@@ -32,7 +32,7 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Position</th>
+                                      
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>Actions</th>
@@ -41,15 +41,17 @@
                                 <tbody>
                                     <?php foreach ($sections as $section): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($section['position']) ?></td>
+                                          
                                             <td><?= htmlspecialchars($section['name']) ?></td>
                                             <td><?= htmlspecialchars($section['description']) ?></td>
                                             <td>
                                                 <a href="/admin/sections/<?= $section['id'] ?>/edit" 
                                                    class="btn btn-sm btn-primary">Edit</a>
-                                                <a href="/admin/sections/<?= $section['id'] ?>/delete" 
-                                                   class="btn btn-sm btn-danger"
-                                                   onclick="return confirm('Are you sure you want to delete this section?')">Delete</a>
+                                                <?php if ($settings['show_delete_buttons'] === 'true'): ?>
+                                                    <a href="/admin/sections/<?= $section['id'] ?>/delete" 
+                                                       class="btn btn-sm btn-danger"
+                                                       onclick="return confirm('Are you sure you want to delete this section?')">Delete</a>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
