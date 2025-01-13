@@ -43,26 +43,30 @@ class Course {
     
     public function update($id, $data) {
         $sql = "UPDATE courses SET 
-                name = ?, short_name = ?, description = ?, policies = ?, 
-                rules = ?, academic_integrity = ?, prerequisites = ?, 
-                teacher = ?, teacher_profile_id = ?, google_classroom_link = ?, 
-                meeting_notes = ?, default_tags = ? 
-                WHERE id = ?";
-        
-        return $this->db->prepare($sql)->execute([
-            $data['name'],
-            $data['short_name'],
-            $data['description'],
-            $data['policies'],
-            $data['rules'],
-            $data['academic_integrity'],
-            $data['prerequisites'],
-            $data['teacher'],
-            $data['teacher_profile_id'],
-            $data['google_classroom_link'],
-            $data['meeting_notes'],
-            $data['default_tags'],
-            $id
+                name = :name,
+                short_name = :short_name,
+                description = :description,
+                aims = :aims,
+                assessment = :assessment,
+                required = :required,
+                communication = :communication,
+                policies = :policies,
+                rules = :rules,
+                updated_at = NOW()
+                WHERE id = :id";
+                
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            'id' => $id,
+            'name' => $data['name'],
+            'short_name' => $data['short_name'],
+            'description' => $data['description'] ?? '',
+            'aims' => $data['aims'] ?? '',
+            'assessment' => $data['assessment'] ?? '',
+            'required' => $data['required'] ?? '',
+            'communication' => $data['communication'] ?? '',
+            'policies' => $data['policies'] ?? '',
+            'rules' => $data['rules'] ?? ''
         ]);
     }
     

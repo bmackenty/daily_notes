@@ -60,3 +60,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic routing system
 - Database structure
 - Core MVC framework 
+
+## [0.6.1] - 2025-01-12
+### Added
+- Pre-fill new daily note content with the previous note's content if available.
+- Integrated TinyMCE for rich text editing in note creation and editing.
+
+### Fixed
+- Resolved issue with undefined variable `$lastNote` in note creation view.
+
+### Technical
+- Updated `createNote` method in `AdminController` to fetch the last note for a section.
+- Added `getLastBySection` method in `Note` model to retrieve the last note for a section. 

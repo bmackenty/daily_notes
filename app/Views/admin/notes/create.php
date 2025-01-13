@@ -48,7 +48,7 @@
                         
                         <div class="mb-3">
                             <label>Content</label>
-                            <textarea id="content" name="content" class="form-control" required></textarea>
+                            <textarea id="content" name="content" class="form-control" required><?= isset($lastNote) ? htmlspecialchars($lastNote['content']) : '' ?></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Save Note</button>
@@ -73,5 +73,6 @@ function validateForm() {
     return true;
 }
 </script>
+
 
 <?php require ROOT_PATH . '/app/Views/partials/footer.php'; ?> 

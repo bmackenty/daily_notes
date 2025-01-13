@@ -120,7 +120,15 @@
                                     <i class="bi bi-people text-primary me-2"></i>
                                     <strong>Available Sections</strong>
                                 </div>
-                                <p class="ms-4 mb-0"><?= count($sections) ?> sections</p>
+                                <ul class="ms-4 mb-0">
+                                    <?php foreach ($sections as $section): ?>
+                                        <li>
+                                            <a href="/">
+                                                <?= htmlspecialchars($section['name']) ?>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
                         </div>
                     </div>

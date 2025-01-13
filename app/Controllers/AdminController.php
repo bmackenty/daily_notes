@@ -216,6 +216,9 @@ class AdminController {
         $section = $this->sectionModel->get($sectionId);
         $course = $this->courseModel->get($section['course_id']);
         
+        // Fetch the last note for the section
+        $lastNote = $this->noteModel->getLastBySection($sectionId);
+        
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             require ROOT_PATH . '/app/Views/admin/notes/create.php';
         } else {
@@ -559,5 +562,13 @@ class AdminController {
             echo json_encode(['error' => 'Profile not found']);
         }
         exit;
+    }
+
+    public function createNoteForm($sectionId) {
+        $section = $this->sectionModel->get($sectionId);
+        $course = $this->courseModel->get($section['course_id']);
+        $lastNote = $this->noteModel->getLastBySection($sectionId);
+
+        require ROOT_PATH . '/app/Views/admin/notes/create.php';
     }
 } 

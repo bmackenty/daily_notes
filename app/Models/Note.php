@@ -101,4 +101,11 @@ class Note {
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
+    
+    public function getLastBySection($sectionId) {
+        $sql = "SELECT * FROM notes WHERE section_id = :section_id ORDER BY date DESC LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['section_id' => $sectionId]);
+        return $stmt->fetch();
+    }
 } 
