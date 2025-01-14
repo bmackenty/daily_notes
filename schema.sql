@@ -45,21 +45,19 @@ CREATE TABLE note_tags (
 );
 
 CREATE TABLE courses (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
-    short_name VARCHAR(50) NOT NULL,
     description TEXT,
-    policies TEXT,
-    rules TEXT,
-    academic_integrity TEXT,
-    prerequisites TEXT,
     teacher VARCHAR(255),
     teacher_profile_id INT,
-    google_classroom_link VARCHAR(255),
-    meeting_notes TEXT,
-    default_tags TEXT,
+    rules TEXT,
+    communication TEXT,
+    required_materials TEXT,
+    github_link VARCHAR(255),
+    lms_link VARCHAR(255),
+    help_link VARCHAR(255),
+    library_link VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (teacher_profile_id) REFERENCES teacher_profiles(id)
 );
 
@@ -150,3 +148,8 @@ CREATE TABLE course_weekly_plans (
     FOREIGN KEY (academic_week_id) REFERENCES academic_weeks(id) ON DELETE CASCADE,
     UNIQUE KEY unique_plan (course_id, academic_week_id)
 );
+
+ALTER TABLE courses ADD COLUMN github_link VARCHAR(255);
+ALTER TABLE courses ADD COLUMN lms_link VARCHAR(255);
+ALTER TABLE courses ADD COLUMN help_link VARCHAR(255);
+ALTER TABLE courses ADD COLUMN library_link VARCHAR(255);
