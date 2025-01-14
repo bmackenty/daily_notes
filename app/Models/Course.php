@@ -44,29 +44,21 @@ class Course {
     public function update($id, $data) {
         $sql = "UPDATE courses SET 
                 name = :name,
-                short_name = :short_name,
                 description = :description,
-                aims = :aims,
-                assessment = :assessment,
-                required = :required,
-                communication = :communication,
-                policies = :policies,
-                rules = :rules,
-                updated_at = NOW()
+                github_link = :github_link,
+                lms_link = :lms_link,
+                help_link = :help_link,
+                library_link = :library_link
                 WHERE id = :id";
                 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
+        return $this->db->prepare($sql)->execute([
             'id' => $id,
             'name' => $data['name'],
-            'short_name' => $data['short_name'],
-            'description' => $data['description'] ?? '',
-            'aims' => $data['aims'] ?? '',
-            'assessment' => $data['assessment'] ?? '',
-            'required' => $data['required'] ?? '',
-            'communication' => $data['communication'] ?? '',
-            'policies' => $data['policies'] ?? '',
-            'rules' => $data['rules'] ?? ''
+            'description' => $data['description'],
+            'github_link' => $data['github_link'] ?? null,
+            'lms_link' => $data['lms_link'] ?? null,
+            'help_link' => $data['help_link'] ?? null,
+            'library_link' => $data['library_link'] ?? null
         ]);
     }
     

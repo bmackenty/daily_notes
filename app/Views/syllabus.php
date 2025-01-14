@@ -20,6 +20,15 @@
                 <div class="col-md-8">
                     <div class="card shadow-sm">
                         <div class="card-body">
+                            <!-- Definition of Syllabus -->
+                            <div class="mb-4 border border-info rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-info-circle-fill text-info me-2" style="font-size: 1.2rem;"></i>
+                                    <h3 class="h5 mb-0">What is a Syllabus?</h3>
+                                </div>
+                                <p class="mb-0">A syllabus is a document that outlines the key components of a course, including the topics to be covered, the schedule of classes, assessment methods, required materials, and other important information. It serves as a guide for both instructors and students to understand the expectations and structure of the course.</p>
+                            </div>
+
                             <!-- Course Description -->
                             <div class="mb-4 border border-info rounded p-3">
                                 <div class="d-flex align-items-center mb-3">

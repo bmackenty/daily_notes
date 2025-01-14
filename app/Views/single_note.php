@@ -20,39 +20,67 @@
                 </ol>
             </nav>
 
+            <!-- Quick Links -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-link-45deg text-primary me-2"></i>
+                        <h3 class="h5 mb-0">Quick Links</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-3 justify-content-center">
+                        <?php if (!empty($course['github_link'])): ?>
+                            <a href="<?= htmlspecialchars($course['github_link']) ?>" class="btn btn-outline-secondary" target="_blank">
+                                <i class="bi bi-github"></i> GitHub
+                            </a>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($course['lms_link'])): ?>
+                            <a href="<?= htmlspecialchars($course['lms_link']) ?>" class="btn btn-outline-primary" target="_blank">
+                                <i class="bi bi-mortarboard"></i> LMS
+                            </a>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($course['help_link'])): ?>
+                            <a href="<?= htmlspecialchars($course['help_link']) ?>" class="btn btn-outline-info" target="_blank">
+                                <i class="bi bi-question-circle"></i> Get Help
+                            </a>
+                        <?php endif; ?>
+                        
+                        <a href="/syllabus/<?= $course['id'] ?>" class="btn btn-outline-success">
+                            <i class="bi bi-file-text"></i> Syllabus
+                        </a>
+                        
+                        <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes" class="btn btn-outline-warning">
+                            <i class="bi bi-journal-text"></i> All Notes
+                        </a>
+
+                        <a href="/courses/<?= $course['id'] ?>/yearly-plans" class="btn btn-outline-info">
+                            <i class="bi bi-calendar-week"></i> Yearly Plan
+                        </a>
+                        
+                        <?php if (!empty($course['library_link'])): ?>
+                            <a href="<?= htmlspecialchars($course['library_link']) ?>" class="btn btn-outline-danger" target="_blank">
+                                <i class="bi bi-book"></i> Class Library
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Note Content -->
             <div class="card">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="h5 mb-0">
                             <i class="bi bi-journal-text text-primary me-2"></i>
-                            Daily Note for <?= date('l, F j, Y', strtotime($note['date'])) ?>
+                            Daily Note for <?= date('F j, Y', strtotime($note['date'])) ?>
                         </h3>
-                        <?php if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'admin'): ?>
-                            <a href="/admin/notes/<?= $note['id'] ?>/edit" class="btn btn-sm btn-primary">
-                                <i class="bi bi-pencil"></i> Edit Note
-                            </a>
-                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="mb-4">
-                        <h5 class="h6">Our note for today:</h5>
-                        <div class="mb-3"><?= $note['content'] ?></div>
-                    </div>
-                    
-                    <?php if (!empty($note['homework'])): ?>
-                        <div class="mb-4">
-                            <h5 class="h6">Homework</h5>
-                            <div class="mb-3"><?= $note['homework'] ?></div>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if (!empty($note['resources'])): ?>
-                        <div class="mb-4">
-                            <h5 class="h6">Resources</h5>
-                            <div><?= $note['resources'] ?></div>
-                        </div>
-                    <?php endif; ?>
+                    <?= $note['content'] ?>
                 </div>
             </div>
         </div>

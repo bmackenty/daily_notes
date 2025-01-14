@@ -84,6 +84,34 @@
                value="<?= isset($course) ? htmlspecialchars($course['default_tags']) : '' ?>">
     </div>
 
+    <!-- Course Links Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Course Links</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label>GitHub Repository</label>
+                <input type="url" name="github_link" class="form-control" value="<?= htmlspecialchars($course['github_link'] ?? '') ?>">
+            </div>
+            
+            <div class="mb-3">
+                <label>Learning Management System (LMS)</label>
+                <input type="url" name="lms_link" class="form-control" value="<?= htmlspecialchars($course['lms_link'] ?? '') ?>">
+            </div>
+            
+            <div class="mb-3">
+                <label>Help/Support Link</label>
+                <input type="url" name="help_link" class="form-control" value="<?= htmlspecialchars($course['help_link'] ?? '') ?>">
+            </div>
+            
+            <div class="mb-3">
+                <label>Class Library</label>
+                <input type="url" name="library_link" class="form-control" value="<?= htmlspecialchars($course['library_link'] ?? '') ?>">
+            </div>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">Save Course</button>
     <a href="/admin/courses" class="btn btn-secondary">Cancel</a>
 </form>
