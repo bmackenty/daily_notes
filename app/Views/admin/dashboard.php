@@ -26,7 +26,7 @@
                 </li>
             </ul>
 
-            <div class="tab-content" id="dashboardContent">
+            <div class="tab-content mb-5" id="dashboardContent">
                 <!-- Overview Tab -->
                 <div class="tab-pane fade show active" id="overview">
                     <div class="row">
@@ -263,6 +263,7 @@
                                             <th>Year</th>
                                             <th>Status</th>
                                             <th>Period</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -279,6 +280,14 @@
                                                 <td>
                                                     <?= date('M d, Y', strtotime($year['start_date'])) ?> - 
                                                     <?= date('M d, Y', strtotime($year['end_date'])) ?>
+                                                </td>
+                                                <td>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-primary" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#editAcademicYearModal<?= $year['id'] ?>">
+                                                        <i class="bi bi-pencil"></i> Edit
+                                                    </button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -326,6 +335,49 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Edit Academic Year Modals -->
+                <?php foreach ($academicYears as $year): ?>
+                <div class="modal fade" id="editAcademicYearModal<?= $year['id'] ?>" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Academic Year</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" action="/admin/settings/academic-years/edit/<?= $year['id'] ?>">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Academic Year Name</label>
+                                        <input type="text" name="name" class="form-control" required 
+                                               value="<?= htmlspecialchars($year['name']) ?>">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label>Start Date</label>
+                                                <input type="date" name="start_date" class="form-control" required
+                                                       value="<?= date('Y-m-d', strtotime($year['start_date'])) ?>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label>End Date</label>
+                                                <input type="date" name="end_date" class="form-control" required
+                                                       value="<?= date('Y-m-d', strtotime($year['end_date'])) ?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Update Academic Year</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
 
                 <!-- Settings Tab -->
                 <div class="tab-pane fade" id="settings">
@@ -453,9 +505,11 @@
                                                     <div class="btn-group">
                                                         <a href="/admin/teacher-profiles/<?= $profile['id'] ?>/edit" 
                                                            class="btn btn-sm btn-primary">Edit</a>
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-info"
-                                                                onclick="viewTeacherProfile(<?= $profile['id'] ?>)">View</button>
+
+                                                        <a class="btn btn-sm btn-info" href="/teacher-profile/<?= $course['teacher_profile_id'] ?>">View</a>                                                              
+
+
+
                                                         <?php if ($settings['show_delete_buttons'] === 'true'): ?>
                                                             <button type="button" 
                                                                     class="btn btn-sm btn-danger"

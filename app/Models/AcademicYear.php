@@ -98,13 +98,41 @@ class AcademicYear {
     }
 
     public function update($id, $data) {
-        $stmt = $this->db->prepare("
-            UPDATE academic_years 
-            SET name = :name, start_date = :start_date, end_date = :end_date 
-            WHERE id = :id
-        ");
-        $data['id'] = $id;
-        return $stmt->execute($data);
+        $this->db->beginTransaction();
+        try {
+            // Update the academic year
+            $stmt = $this->db->prepare("
+                UPDATE academic_years 
+                SET name = :name, 
+                    start_date = :start_date, 
+                    end_date = :end_date
+                WHERE id = :id
+            ");
+            
+            $stmt->execute([
+                'id' => $id,
+                'name' => $data['name'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date']
+            ]);
+
+            // Regenerate weeks if num_weeks is provided
+            if (isset($data['num_weeks'])) {
+                // Delete existing weeks
+                $stmt = $this->db->prepare("DELETE FROM academic_weeks WHERE academic_year_id = ?");
+                $stmt->execute([$id]);
+                
+                // Generate new weeks
+                $this->generateWeeks($id, $data['num_weeks']);
+            }
+
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            error_log($e->getMessage());
+            return false;
+        }
     }
 
     public function getWeeks($academicYearId) {

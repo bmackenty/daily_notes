@@ -275,12 +275,23 @@ class AdminController {
         $academicYearModel = new AcademicYear($this->db);
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if ($academicYearModel->update($id, $_POST)) {
+            $start = new DateTime($_POST['start_date']);
+            $end = new DateTime($_POST['end_date']);
+            $interval = $start->diff($end);
+            
+            $data = [
+                'name' => $_POST['name'],
+                'start_date' => $_POST['start_date'],
+                'end_date' => $_POST['end_date'],
+                'num_weeks' => ceil($interval->days / 7)
+            ];
+            
+            if ($academicYearModel->update($id, $data)) {
                 $_SESSION['success'] = 'Academic year updated successfully';
             } else {
                 $_SESSION['error'] = 'Failed to update academic year';
             }
-            header('Location: /admin/dashboard');
+            header('Location: /admin/dashboard#academic');
             exit;
         }
     }

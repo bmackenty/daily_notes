@@ -159,5 +159,57 @@ class CourseController {
         $sections = $this->sectionModel->getAllByCourse($courseId);
         require ROOT_PATH . '/app/Views/courses/show.php';
     }
+
+    public function viewNote($courseId, $sectionId, $noteId) {
+        $course = $this->courseModel->get($courseId);
+        $section = $this->sectionModel->get($sectionId);
+        $note = $this->noteModel->get($noteId);
+        
+        if (!$course || !$section || !$note) {
+            $_SESSION['error'] = 'Course, section, or note not found';
+            header('Location: /');
+            exit;
+        }
+        
+        // Get all notes for this section
+        $allNotes = $this->noteModel->getAllBySection($sectionId);
+        
+        // Sort notes by date in descending order (newest first)
+        usort($allNotes, function($a, $b) {
+            return strtotime($b['date']) - strtotime($a['date']);
+        });
+        
+        // Initialize variables
+        $previousNote = null;
+        $nextNote = null;
+        $isCurrentNote = false;
+        
+        // Find current note position
+        foreach ($allNotes as $index => $currentNote) {
+            if ($currentNote['id'] == $noteId) {
+                // If this is the first note (most current)
+                if ($index == 0) {
+                    $isCurrentNote = true;
+                    if (isset($allNotes[$index + 1])) {
+                        $previousNote = $allNotes[$index + 1];
+                    }
+                } else {
+                    if (isset($allNotes[$index + 1])) {
+                        $previousNote = $allNotes[$index + 1];
+                    }
+                    if (isset($allNotes[$index - 1])) {
+                        $nextNote = $allNotes[$index - 1];
+                    }
+                }
+                break;
+            }
+        }
+        
+        return [
+            'previousNote' => $previousNote,
+            'nextNote' => $nextNote,
+            'isCurrentNote' => $isCurrentNote,
+        ];
+    }
 } 
 

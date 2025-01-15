@@ -70,7 +70,7 @@
             </div>
 
             <!-- Daily Note Content -->
-            <div class="card">
+            <div class="card mb-5">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="h5 mb-0">
@@ -78,11 +78,14 @@
                             Daily Note for <?= date('F j, Y', strtotime($note['date'])) ?>
                         </h3>
                     </div>
+         
                 </div>
                 <div class="card-body">
                     <?= $note['content'] ?>
                 </div>
             </div>
+
+
         </div>
     </div>
 </div>

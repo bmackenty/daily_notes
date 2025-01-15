@@ -10,7 +10,7 @@
                 </ol>
             </nav>
 
-            <div class="card">
+            <div class="card mb-5">
                 <div class="card-header bg-light">
                     <h3 class="h5 mb-0">
                         <i class="bi bi-calendar-week text-primary me-2"></i>
