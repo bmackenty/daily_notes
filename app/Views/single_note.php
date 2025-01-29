@@ -20,6 +20,14 @@
                 </ol>
             </nav>
 
+            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="/admin/notes/<?= $note['id'] ?>/edit" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Edit Note
+                    </a>
+                </div>
+            <?php endif; ?>
+
             <!-- Quick Links -->
             <div class="card mb-4">
                 <div class="card-header bg-light">

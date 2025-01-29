@@ -175,26 +175,12 @@
                                 <td><?= htmlspecialchars($course['name']) ?></td>
                                 <td><?= htmlspecialchars($course['short_name']) ?></td>
                                 <td><?= htmlspecialchars($course['teacher']) ?></td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="/admin/courses/edit/<?= $course['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                                        <a href="/admin/courses/<?= $course['id'] ?>/sections" class="btn btn-sm btn-info">Sections</a>
-                                        <a href="/admin/courses/<?= $course['id'] ?>/weekly-plans" class="btn btn-sm btn-secondary">
-                                            <i class="bi bi-calendar-week"></i> Weekly Plans
-                                        </a>
-                                        <?php if ($settings['show_delete_buttons'] === 'true'): ?>
-                                            <a href="/admin/courses/<?= $course['id'] ?>/delete" 
-                                               class="btn btn-sm btn-danger" 
-                                               onclick="return confirm('Are you sure you want to delete this course?')">Delete</a>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
                             </tr>
                             <?php 
                             $sections = $sectionModel->getAllByCourse($course['id']);
                             if (!empty($sections)): 
                             ?>
-                            <tr>
+                            <tr> 
                                 <td colspan="4" class="p-0">
                                     <div class="ms-4 my-2 bg-secondary bg-opacity-10 rounded p-3">
                                         <table class="table table-secondary table-sm mb-0">
@@ -421,6 +407,7 @@
                                         <tr>
                                             <th>Course Name</th>
                                             <th>Sections</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -460,6 +447,15 @@
                                                     <?php else: ?>
                                                         <em class="text-muted">No sections</em>
                                                     <?php endif; ?>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a href="/admin/courses/edit/<?= $course['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+                                                        <a href="/admin/courses/<?= $course['id'] ?>/sections" class="btn btn-sm btn-info">Sections</a>
+                                                        <a href="/admin/courses/<?= $course['id'] ?>/weekly-plans" class="btn btn-sm btn-secondary">
+                                                            <i class="bi bi-calendar-week"></i> Weekly Plans
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
