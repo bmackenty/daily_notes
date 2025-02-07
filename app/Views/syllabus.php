@@ -8,7 +8,7 @@
         </ol>
     </nav>
 
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header bg-primary text-white">
             <div class="d-flex align-items-center">
                 <i class="bi bi-book-half me-2" style="font-size: 1.5rem;"></i>

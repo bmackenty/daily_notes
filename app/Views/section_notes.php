@@ -31,7 +31,7 @@ function human_timing($timestamp) {
                 </ol>
             </nav>
 
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="h5 mb-0">
