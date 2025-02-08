@@ -10,6 +10,7 @@ use App\Models\AcademicYear;
 use App\Models\WeeklyPlan;
 use DateTime;
 use App\Models\TeacherProfile;
+use App\Models\LearningStatement;
 
 class AdminController {
     private $settingModel;
@@ -18,6 +19,7 @@ class AdminController {
     private $noteModel;
     private $db;
     private $teacherProfileModel;
+    private $learningStatementModel;
     
     public function __construct($db) {
         if (session_status() === PHP_SESSION_NONE) {
@@ -37,6 +39,7 @@ class AdminController {
         $this->sectionModel = new Section($db);
         $this->noteModel = new Note($db);
         $this->teacherProfileModel = new TeacherProfile($db);
+        $this->learningStatementModel = new LearningStatement($db);
     }
     
     public function dashboard() {
@@ -71,6 +74,8 @@ class AdminController {
         foreach ($teacherProfiles as $profile) {
             $profileCourses[$profile['id']] = $this->courseModel->getCoursesByTeacherProfileId($profile['id']);
         }
+
+        $learningStatements = $this->learningStatementModel->getAll();
 
         require ROOT_PATH . '/app/Views/admin/dashboard.php';
     }
@@ -581,5 +586,49 @@ class AdminController {
         $lastNote = $this->noteModel->getLastBySection($sectionId);
 
         require ROOT_PATH . '/app/Views/admin/notes/create.php';
+    }
+
+    public function createLearningStatement() {
+        if ($this->learningStatementModel->create($_POST)) {
+            $_SESSION['success'] = 'Learning statement created successfully';
+        } else {
+            $_SESSION['error'] = 'Failed to create learning statement';
+        }
+        header('Location: /admin/dashboard#learning-statements');
+        exit;
+    }
+
+    public function editLearningStatement($id) {
+        if ($this->learningStatementModel->update($id, $_POST)) {
+            $_SESSION['success'] = 'Learning statement updated successfully';
+        } else {
+            $_SESSION['error'] = 'Failed to update learning statement';
+        }
+        header('Location: /admin/dashboard#learning-statements');
+        exit;
+    }
+
+    public function deleteLearningStatement($id) {
+        $success = $this->learningStatementModel->delete($id);
+        return json_encode(['success' => $success]);
+    }
+
+    public function reorderLearningStatements() {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $success = true;
+        
+        if (isset($data['orders']) && is_array($data['orders'])) {
+            foreach ($data['orders'] as $order) {
+                if (!$this->learningStatementModel->updatePosition($order['id'], $order['position'])) {
+                    $success = false;
+                    break;
+                }
+            }
+        } else {
+            $success = false;
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success]);
     }
 } 

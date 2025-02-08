@@ -73,10 +73,13 @@ CREATE TABLE sections (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
-CREATE TABLE learning_statements (
+CREATE TABLE IF NOT EXISTS learning_statement (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    identifier TEXT,
-    learning_statement TEXT
+    identifier VARCHAR(255),
+    learning_statement TEXT NOT NULL,
+    position INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE teacher_profiles (

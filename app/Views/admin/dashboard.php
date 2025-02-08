@@ -24,6 +24,9 @@
                 <li class="nav-item">
                     <a class="nav-link" id="teacher-profiles-tab" data-bs-toggle="tab" href="#teacher-profiles">Teacher Profiles</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="learning-statements-tab" data-bs-toggle="tab" href="#learning-statements">Learning Statements</a>
+                </li>
             </ul>
 
             <div class="tab-content mb-5" id="dashboardContent">
@@ -521,9 +524,176 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Learning Statements Tab -->
+                <div class="tab-pane fade" id="learning-statements">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Learning Statements</h2>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLearningStatementModal">
+                            Add New Statement
+                        </button>
+                    </div>
+
+                    <?php if (isset($_SESSION['success'])): ?>
+                        <div class="alert alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                    <?php endif; ?>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="learningStatementsTable" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th width="100">Identifier</th>
+                                            <th>Learning Statement</th>
+                                            <th width="100" class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($learningStatements as $statement): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($statement['identifier'] ?? '') ?></td>
+                                            <td class="w-100"><?= htmlspecialchars($statement['learning_statement'] ?? '') ?></td>
+                                            <td class="text-end">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-primary" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#editLearningStatementModal<?= $statement['id'] ?>">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <?php if ($settings['show_delete_buttons'] === 'true'): ?>
+                                                        <button onclick="deleteLearningStatement(<?= $statement['id'] ?>)" 
+                                                                class="btn btn-sm btn-danger">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Learning Statement Modal -->
+                <div class="modal fade" id="addLearningStatementModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add New Learning Statement</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" action="/admin/learning-statements/create">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Identifier</label>
+                                        <input type="text" name="identifier" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Learning Statement</label>
+                                        <textarea name="learning_statement" class="form-control" rows="3" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Create Statement</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Learning Statement Modals -->
+                <?php foreach ($learningStatements as $statement): ?>
+                <div class="modal fade" id="editLearningStatementModal<?= $statement['id'] ?>" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Learning Statement</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="POST" action="/admin/learning-statements/edit/<?= $statement['id'] ?>">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Identifier</label>
+                                        <input type="text" name="identifier" class="form-control" 
+                                               value="<?= htmlspecialchars($statement['identifier']) ?>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Learning Statement</label>
+                                        <textarea name="learning_statement" class="form-control" rows="3" required><?= htmlspecialchars($statement['learning_statement']) ?></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Update Statement</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.handle {
+    cursor: move;
+}
+.handle-header {
+    cursor: default;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    let table = $('#learningStatementsTable').DataTable({
+        dom: '<"d-flex justify-content-between align-items-center mb-3"lf>rtip',
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        order: [[0, 'asc']],
+        columns: [
+            { orderable: true, className: 'reorder' },  // Identifier
+            { orderable: false },  // Learning Statement
+            { orderable: false }  // Actions
+        ],
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search statements...",
+            lengthMenu: "_MENU_ statements per page"
+        }
+    });
+
+    // Keep the original delete function
+    window.deleteLearningStatement = function(id) {
+        if (confirm('Are you sure you want to delete this learning statement?')) {
+            fetch(`/admin/learning-statements/delete/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    table.row($(`button[onclick*="deleteLearningStatement(${id})"]`).closest('tr'))
+                        .remove()
+                        .draw();
+                } else {
+                    alert('Failed to delete learning statement');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the learning statement');
+            });
+        }
+    };
+});
+</script>
 
 <?php require ROOT_PATH . '/app/Views/partials/footer.php'; ?>

@@ -278,6 +278,28 @@ switch ($request) {
         $controller->teacherProfile($matches[1]);
         break;
 
+    // Learning Statement routes
+    case '/admin/learning-statements/create':
+        $controller = new AdminController($pdo);
+        if ($request_method === 'POST') {
+            $controller->createLearningStatement();
+        }
+        break;
+
+    case (preg_match('/^\/admin\/learning-statements\/edit\/(\d+)$/', $request, $matches) ? true : false):
+        $controller = new AdminController($pdo);
+        if ($request_method === 'POST') {
+            $controller->editLearningStatement($matches[1]);
+        }
+        break;
+
+    case (preg_match('/^\/admin\/learning-statements\/delete\/(\d+)$/', $request, $matches) ? true : false):
+        $controller = new AdminController($pdo);
+        if ($request_method === 'POST') {
+            echo $controller->deleteLearningStatement($matches[1]);
+        }
+        break;
+
     default:
         require ROOT_PATH . '/app/Views/404.php';
         break;
