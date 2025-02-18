@@ -86,7 +86,7 @@ function human_timing($timestamp) {
                     </div>
                 </div>
                 <?php if (!empty($notes)): ?>
-                    <div class="card-body border-bottom">
+                    <div class="card-body mb-4">
                         <h4 class="h6 text-muted mb-3">
                             Most Recent Note 
                             <span class="text-muted">
@@ -107,9 +107,12 @@ function human_timing($timestamp) {
                         </div>
                     </div>
                 <?php endif; ?>
-                <div class="card-body">
-                    <?php if (empty($notes)): ?>
-                        <div class="alert alert-info">
+                </div> <!-- close card -->
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <?php if (empty($notes)): ?>
+                            <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
                             No daily notes have been added for this section yet.
                         </div>
