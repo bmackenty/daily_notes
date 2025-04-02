@@ -1,7 +1,7 @@
 <?php require ROOT_PATH . '/app/Views/partials/header.php'; ?>
 
 <div class="container mt-5">
-    <div class="row">
+    <div class="row mb-4">
         <div class="col-md-12">
             <h2 class="mb-4">All Courses</h2>
             
