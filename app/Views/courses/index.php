@@ -32,7 +32,10 @@
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-collection text-info me-2"></i>
-                                    <span class="text-muted"><?= count($sections[$course['id']]) ?> sections</span>
+                                    <?php $sectionCount = count($sections[$course['id']]); ?>
+                                    <span class="text-muted">
+                                        <?= $sectionCount . ' ' . ($sectionCount === 1 ? 'section' : 'sections') ?>
+                                    </span>
                                 </div>
                             </div>
                         </div>
