@@ -244,6 +244,17 @@ switch ($request) {
         $controller->show($matches[1]);
         break;
 
+    // Search routes
+    case (preg_match('/^\/courses\/(\d+)\/search$/', $request, $matches) ? true : false):
+        $controller = new CourseController($pdo);
+        $controller->search($matches[1]);
+        break;
+
+    case (preg_match('/^\/courses\/(\d+)\/sections\/(\d+)\/search$/', $request, $matches) ? true : false):
+        $controller = new CourseController($pdo);
+        $controller->search($matches[1], $matches[2]);
+        break;
+
     // Teacher Profile routes
     case '/admin/teacher-profiles/create':
         $controller = new AdminController($pdo);

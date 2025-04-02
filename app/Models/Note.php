@@ -108,4 +108,25 @@ class Note {
         $stmt->execute(['section_id' => $sectionId]);
         return $stmt->fetch();
     }
+
+    public function search($query, $sectionId = null) {
+        $sql = "SELECT n.*, s.name as section_name, c.name as course_name 
+                FROM notes n 
+                JOIN sections s ON n.section_id = s.id 
+                JOIN courses c ON s.course_id = c.id 
+                WHERE (n.title LIKE ? OR n.content LIKE ?)";
+        
+        $params = ["%$query%", "%$query%"];
+        
+        if ($sectionId) {
+            $sql .= " AND n.section_id = ?";
+            $params[] = $sectionId;
+        }
+        
+        $sql .= " ORDER BY n.date DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
 } 

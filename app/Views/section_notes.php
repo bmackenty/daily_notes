@@ -76,6 +76,24 @@ function human_timing($timestamp) {
                 </div>
             </div>
 
+            <!-- Search -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-search text-primary me-2"></i>
+                        <h3 class="h5 mb-0">Search Notes</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form action="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/search" method="GET" class="d-flex gap-2">
+                        <input type="text" name="q" class="form-control" placeholder="Search notes..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </form>
+                </div>
+            </div>
+
             <div class="card mb-4">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center">

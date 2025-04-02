@@ -211,5 +211,56 @@ class CourseController {
             'isCurrentNote' => $isCurrentNote,
         ];
     }
+
+    public function search($courseId, $sectionId = null) {
+        $course = $this->courseModel->get($courseId);
+        if (!$course) {
+            $_SESSION['error'] = 'Course not found';
+            header('Location: /courses');
+            exit;
+        }
+
+        $section = null;
+        if ($sectionId) {
+            $section = $this->sectionModel->get($sectionId);
+            if (!$section) {
+                $_SESSION['error'] = 'Section not found';
+                header('Location: /courses/' . $courseId);
+                exit;
+            }
+        }
+
+        $query = $_GET['q'] ?? '';
+        $notes = [];
+        
+        if (!empty($query)) {
+            $notes = $this->noteModel->search($query, $sectionId);
+            
+            // Process content for each note
+            foreach ($notes as &$note) {
+                // Strip HTML tags for preview but preserve line breaks
+                $content = strip_tags($note['content'], '<br><p>');
+                $content = str_replace(['<br>', '<br/>', '<br />', '</p>'], "\n", $content);
+                $content = str_replace('<p>', '', $content);
+                $content = preg_replace('/\n\s+/', "\n", $content); // Remove extra whitespace
+                $content = trim($content);
+                
+                // Get first 200 characters and ensure we don't cut words
+                if (strlen($content) > 200) {
+                    $content = substr($content, 0, 200);
+                    $pos = strrpos($content, ' ');
+                    if ($pos !== false) {
+                        $content = substr($content, 0, $pos);
+                    }
+                    $content .= '...';
+                }
+                
+                $note['content'] = $content;
+            }
+        }
+
+        $sections = $this->sectionModel->getAllByCourse($courseId);
+        require ROOT_PATH . '/app/Views/search_results.php';
+    }
 } 
 

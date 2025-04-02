@@ -9,16 +9,16 @@
     </nav>
 
     <div class="row">
-        <div class="col-md-4 text-center mb-4">
-            <img src="<?= !empty($profile['profile_picture']) ? htmlspecialchars($profile['profile_picture']) : '/public/assets/images/default-avatar.svg' ?>" 
-                 class="img-fluid rounded-circle mb-3" 
-                 style="max-width: 200px; height: 200px; object-fit: cover;" 
-                 alt="<?= htmlspecialchars($profile['full_name']) ?>'s Profile Picture">
-            <h2><?= htmlspecialchars($profile['full_name']) ?></h2>
-            <p class="text-muted"><?= htmlspecialchars($profile['title']) ?></p>
-        </div>
-        
-        <div class="col-md-8">
+        <div class="col-md-4">
+            <div class="text-center mb-4">
+                <img src="<?= !empty($profile['profile_picture']) ? htmlspecialchars($profile['profile_picture']) : '/public/assets/images/default-avatar.svg' ?>" 
+                     class="img-fluid rounded-circle mb-3" 
+                     style="max-width: 200px; height: 200px; object-fit: cover;" 
+                     alt="<?= htmlspecialchars($profile['full_name']) ?>'s Profile Picture">
+                <h2><?= htmlspecialchars($profile['full_name']) ?></h2>
+                <p class="text-muted"><?= htmlspecialchars($profile['title']) ?></p>
+            </div>
+
             <div class="card mb-4">
                 <div class="card-body">
                     <h3 class="card-title">Contact Information</h3>
@@ -31,7 +31,9 @@
                     <?php endif; ?>
                 </div>
             </div>
-
+        </div>
+        
+        <div class="col-md-8">
             <?php if (!empty($profile['biography'])): ?>
             <div class="card mb-4">
                 <div class="card-body">
@@ -59,11 +61,17 @@
             </div>
             <?php endif; ?>
 
-            <?php if (!empty($courses)): ?>
+            <?php if (!empty($profile['vision_for_students'])): ?>
             <div class="card mb-4">
                 <div class="card-body">
+                    <h3 class="card-title">Vision for Students</h3>
+                    <p><?= nl2br(htmlspecialchars($profile['vision_for_students'])) ?></p>
+                </div>
+            </div>
+            <?php endif; ?>
+
                     <h3 class="card-title">Courses</h3>
-                    <div class="list-group">
+                    <div class="list-group mb-4">
                         <?php foreach ($courses as $course): ?>
                             <a href="/syllabus/<?= $course['id'] ?>" class="list-group-item list-group-item-action">
                                 <i class="bi bi-book me-2"></i><?= htmlspecialchars($course['name']) ?>
@@ -72,7 +80,6 @@
                     </div>
                 </div>
             </div>
-            <?php endif; ?>
         </div>
     </div>
 </div>
