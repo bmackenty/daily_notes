@@ -28,6 +28,16 @@
                             <div class="mb-3">
                                 <label>Password</label>
                                 <input type="password" name="password" class="form-control" required>
+                                <small class="form-text text-muted">
+                                    Password must:
+                                    <ul>
+                                        <li>Be at least 8 characters long</li>
+                                        <li>Contain at least one uppercase letter</li>
+                                        <li>Contain at least one lowercase letter</li>
+                                        <li>Contain at least one number</li>
+                                        <li>Contain at least one special character</li>
+                                    </ul>
+                                </small>
                             </div>
                             <div class="mb-3">
                                 <label>Confirm Password</label>

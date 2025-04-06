@@ -42,3 +42,139 @@
 - MySQL 5.7 or higher
 - Apache/Nginx web server
 - Composer package manager
+
+## Configuration
+
+The application uses environment variables for configuration. Copy the `.env.example` file to `.env` and update the values:
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file with your database credentials and other configuration values.
+
+### Security Note
+- Never commit the `.env` file to version control
+- Keep your database credentials secure
+- The `.env` file is automatically ignored by git
+
+## Security Features
+
+### Authentication & Authorization
+- Secure password storage using bcrypt
+- Account lockout after 5 failed login attempts (15-minute lockout)
+- Rate limiting (10 attempts per 60 seconds per IP)
+- Password requirements:
+  - Minimum 8 characters
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+  - At least one special character
+
+### Session Security
+- Secure session configuration with:
+  - Custom session name
+  - HttpOnly cookies
+  - SameSite cookie policy
+  - Secure cookies in production
+  - Session timeout after 1 hour of inactivity
+  - Automatic session ID regeneration every 30 minutes
+- Protection against:
+  - Session hijacking
+  - Session fixation
+  - Session sidejacking
+
+### Database Security
+- Environment-based configuration
+- Secure credential storage
+- Prepared statements for all queries
+- Input validation and sanitization
+- Error logging without sensitive information
+
+### File Security
+- Secure file permissions
+- Environment file protection
+- Log file management
+- Secure upload handling
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/daily-notes.git
+cd daily-notes
+```
+
+2. Create and configure the `.env` file:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+3. Set proper file permissions:
+```bash
+chmod 640 .env
+chown www-data:www-data .env
+```
+
+4. Run the database migrations:
+```bash
+php database/migrate.php
+```
+
+5. Configure your web server:
+- Ensure HTTPS is enabled
+- Set proper security headers
+- Configure PHP session handling
+
+## Configuration
+
+### Environment Variables
+Required environment variables in `.env`:
+```
+DB_HOST=localhost
+DB_NAME=dailynotes
+DB_USER=your_db_user
+DB_PASS=your_db_password
+DB_CHARSET=utf8mb4
+
+APP_ENV=production
+APP_DOMAIN=yourdomain.com
+```
+
+### Security Settings
+Default security settings (configurable in database):
+- Max login attempts: 5
+- Lockout duration: 15 minutes
+- Rate limit window: 60 seconds
+- Max rate limit: 10 attempts
+- Session timeout: 1 hour
+- Session regeneration: 30 minutes
+
+## Usage
+
+1. Access the application through your web browser
+2. Register a new account or login with existing credentials
+3. Create and manage your notes, courses, and teaching materials
+
+## Security Best Practices
+
+1. Always use HTTPS in production
+2. Keep the application and dependencies updated
+3. Regularly review and rotate credentials
+4. Monitor security logs for suspicious activity
+5. Implement IP-based blocking for repeated failed attempts
+6. Use strong, unique passwords
+7. Enable two-factor authentication if available
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

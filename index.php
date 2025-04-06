@@ -16,11 +16,11 @@ if (!file_exists(ROOT_PATH . '/logs')) {
 ini_set('error_log', ERROR_LOG_PATH);
 ini_set('log_errors', 1);
 
-// Load database connection
-require_once ROOT_PATH . '/config/database.php';
-
 // Load required classes
+require_once ROOT_PATH . '/app/Utils/Config.php';
 require_once ROOT_PATH . '/app/Utils/Logger.php';
+require_once ROOT_PATH . '/app/Utils/Security.php';
+require_once ROOT_PATH . '/app/Utils/SessionManager.php';
 require_once ROOT_PATH . '/app/Models/User.php';
 require_once ROOT_PATH . '/app/Models/Setting.php';
 require_once ROOT_PATH . '/app/Models/Course.php';
@@ -35,6 +35,9 @@ require_once ROOT_PATH . '/app/Controllers/AdminController.php';
 require_once ROOT_PATH . '/app/Controllers/CourseController.php';
 require_once ROOT_PATH . '/app/Models/Tag.php';
 require_once ROOT_PATH . '/app/Models/LearningStatement.php';
+
+// Load database connection
+require_once ROOT_PATH . '/config/database.php';
 
 // Load router
 require_once ROOT_PATH . '/routes/web.php';

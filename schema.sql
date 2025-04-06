@@ -1,3 +1,4 @@
+-- Users table with enhanced security fields
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -5,10 +6,50 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') DEFAULT 'user',
     status ENUM('active', 'inactive') DEFAULT 'active',
+    failed_login_attempts INT DEFAULT 0,
+    last_failed_login TIMESTAMP NULL,
+    account_locked_until TIMESTAMP NULL,
+    password_reset_token VARCHAR(255) NULL,
+    password_reset_expires TIMESTAMP NULL,
+    last_password_change TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Login attempts tracking
+CREATE TABLE login_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    success BOOLEAN DEFAULT FALSE,
+    INDEX idx_ip_email (ip_address, email),
+    INDEX idx_time (attempt_time)
+);
+
+-- Security settings
+CREATE TABLE security_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(50) NOT NULL UNIQUE,
+    setting_value TEXT,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert default security settings
+INSERT INTO security_settings (setting_key, setting_value, description) VALUES
+('max_login_attempts', '5', 'Maximum number of failed login attempts before account lockout'),
+('lockout_duration', '15', 'Account lockout duration in minutes'),
+('rate_limit_window', '60', 'Rate limit window in seconds'),
+('max_rate_limit', '10', 'Maximum number of login attempts per rate limit window'),
+('password_min_length', '8', 'Minimum password length'),
+('password_require_uppercase', '1', 'Password must contain uppercase letters'),
+('password_require_lowercase', '1', 'Password must contain lowercase letters'),
+('password_require_numbers', '1', 'Password must contain numbers'),
+('password_require_special', '1', 'Password must contain special characters');
+
+-- Existing tables
 CREATE TABLE notes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     section_id INT NOT NULL,
@@ -114,9 +155,7 @@ INSERT INTO settings (setting_key, setting_value, description) VALUES
 ('maintenance_mode', 'false', 'Site maintenance mode'),
 ('show_delete_buttons', 'false', 'Show delete buttons for courses and sections');
 
-ALTER TABLE notes ADD COLUMN section_id INT NOT NULL,
-ADD FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE; 
-
+-- Create academic years table
 CREATE TABLE academic_years (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -127,6 +166,7 @@ CREATE TABLE academic_years (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Create academic weeks table
 CREATE TABLE academic_weeks (
     id INT PRIMARY KEY AUTO_INCREMENT,
     academic_year_id INT NOT NULL,
@@ -137,6 +177,7 @@ CREATE TABLE academic_weeks (
     UNIQUE KEY unique_week (academic_year_id, week_number)
 );
 
+-- Create course weekly plans table
 CREATE TABLE course_weekly_plans (
     id INT PRIMARY KEY AUTO_INCREMENT,
     course_id INT NOT NULL,
@@ -152,7 +193,5 @@ CREATE TABLE course_weekly_plans (
     UNIQUE KEY unique_plan (course_id, academic_week_id)
 );
 
-ALTER TABLE courses ADD COLUMN github_link VARCHAR(255);
-ALTER TABLE courses ADD COLUMN lms_link VARCHAR(255);
-ALTER TABLE courses ADD COLUMN help_link VARCHAR(255);
-ALTER TABLE courses ADD COLUMN library_link VARCHAR(255);
+ALTER TABLE notes ADD COLUMN section_id INT NOT NULL,
+ADD FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE; 

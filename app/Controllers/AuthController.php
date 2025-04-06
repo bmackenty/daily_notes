@@ -4,11 +4,15 @@ namespace App\Controllers;
 use App\Models\User;
 use App\Models\Setting;
 use App\Utils\Logger;
+use App\Utils\Security;
+use App\Utils\SessionManager;
 
 class AuthController {
     private $userModel;
     private $settingModel;
+    private $security;
     private $db;
+    private $session;
     
     public function __construct($db) {
         if (session_status() === PHP_SESSION_NONE) {
@@ -17,6 +21,8 @@ class AuthController {
         $this->db = $db;
         $this->userModel = new User($db);
         $this->settingModel = new Setting($db);
+        $this->security = new Security($db);
+        $this->session = SessionManager::getInstance();
     }
     
     public function showLogin() {
@@ -30,14 +36,38 @@ class AuthController {
     
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'];
-            Logger::log("Login attempt for email: $email");
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $ip = $_SERVER['REMOTE_ADDR'];
+            
+            // Check rate limit
+            if (!$this->security->checkRateLimit($ip, $email)) {
+                $this->session->flash('error', 'Too many login attempts. Please try again later.');
+                header('Location: /login');
+                exit;
+            }
+            
+            // Check account lockout
+            if ($lockoutUntil = $this->security->checkAccountLockout($email)) {
+                $this->session->flash('error', 'Account is locked until ' . date('Y-m-d H:i:s', strtotime($lockoutUntil)));
+                header('Location: /login');
+                exit;
+            }
             
             $user = $this->userModel->findByEmail($email);
             
-            if ($user && password_verify($_POST['password'], $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_role'] = $user['role'];
+            if ($user && password_verify($password, $user['password'])) {
+                // Record successful login
+                $this->security->recordLoginAttempt($ip, $email, true);
+                $this->security->resetFailedAttempts($email);
+                
+                // Set session variables
+                $this->session->set('user_id', $user['id']);
+                $this->session->set('user_email', $user['email']);
+                $this->session->set('user_role', $user['role']);
+                $this->session->set('last_activity', time());
+                
+                Logger::log("User {$user['email']} logged in successfully", 'INFO');
                 
                 if ($user['role'] === 'admin') {
                     header('Location: /admin/dashboard');
@@ -45,58 +75,81 @@ class AuthController {
                     header('Location: /dashboard');
                 }
                 exit;
+            } else {
+                // Record failed login
+                $this->security->recordLoginAttempt($ip, $email, false);
+                $this->security->incrementFailedAttempts($email);
+                
+                Logger::log("Failed login attempt for email: $email from IP: $ip", 'WARNING');
+                
+                $this->session->flash('error', 'Invalid email or password');
+                header('Location: /login');
+                exit;
             }
-            
-            Logger::log("Failed login attempt for email: $email", 'WARNING');
-            $_SESSION['error'] = 'Invalid credentials';
-            header('Location: /login');
-            exit;
         }
+        
+        require_once ROOT_PATH . '/app/Views/auth/login.php';
     }
     
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if ($this->settingModel->get('registration_enabled') !== 'true') {
-                Logger::log("Registration attempt when disabled", 'WARNING');
-                $_SESSION['error'] = 'Registration is currently disabled';
-                header('Location: /login');
-                exit;
-            }
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $confirmPassword = $_POST['confirm_password'] ?? '';
             
-            $email = $_POST['email'];
-            Logger::log("Registration attempt for email: $email");
-            
-            if ($_POST['password'] !== $_POST['confirm_password']) {
-                Logger::log("Registration failed - passwords don't match for email: $email", 'WARNING');
-                $_SESSION['error'] = 'Passwords do not match';
+            // Validate password
+            $passwordValidation = $this->security->validatePassword($password);
+            if ($passwordValidation !== true) {
+                $this->session->flash('error', $passwordValidation);
                 header('Location: /register');
                 exit;
             }
-
+            
+            if ($password !== $confirmPassword) {
+                $this->session->flash('error', 'Passwords do not match');
+                header('Location: /register');
+                exit;
+            }
+            
+            // Check if registration is enabled
+            $setting = $this->settingModel->findByKey('registration_enabled');
+            if (!$setting || $setting['value'] !== '1') {
+                $this->session->flash('error', 'Registration is currently disabled');
+                header('Location: /register');
+                exit;
+            }
+            
+            // Check if email already exists
             if ($this->userModel->findByEmail($email)) {
-                Logger::log("Registration failed - email already exists: $email", 'WARNING');
-                $_SESSION['error'] = 'Email already exists';
+                $this->session->flash('error', 'Email already registered');
                 header('Location: /register');
                 exit;
             }
             
-            if ($this->userModel->create($_POST)) {
-                Logger::log("Successful registration for email: $email", 'SUCCESS');
-                $_SESSION['success'] = 'Registration successful. Please login.';
+            // Create user
+            $userId = $this->userModel->create([
+                'email' => $email,
+                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'role' => 'user'
+            ]);
+            
+            if ($userId) {
+                Logger::log("New user registered: $email", 'INFO');
+                $this->session->flash('success', 'Registration successful. Please login.');
                 header('Location: /login');
                 exit;
+            } else {
+                $this->session->flash('error', 'Registration failed');
+                header('Location: /register');
+                exit;
             }
-            
-            Logger::log("Registration failed - database error for email: $email", 'ERROR');
-            $_SESSION['error'] = 'Registration failed';
-            header('Location: /register');
-            exit;
         }
+        
+        require_once ROOT_PATH . '/app/Views/auth/register.php';
     }
     
     public function logout() {
-        Logger::log("User logged out: " . ($_SESSION['user_id'] ?? 'unknown'));
-        session_destroy();
+        $this->session->destroySession();
         header('Location: /login');
         exit;
     }
