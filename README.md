@@ -41,7 +41,13 @@
 - PHP 7.4 or higher
 - MySQL 5.7 or higher
 - Apache/Nginx web server
-- Composer package manager
+
+## 🔒 Security Features
+- Secure authentication with account lockout and rate limiting
+- Encrypted password storage and secure session handling
+- Input validation and prepared statements
+- Environment-based configuration and secure file handling
+
 
 ## Configuration
 
@@ -58,20 +64,7 @@ Edit the `.env` file with your database credentials and other configuration valu
 - Keep your database credentials secure
 - The `.env` file is automatically ignored by git
 
-## Security Features
 
-### Authentication & Authorization
-- Secure password storage with bcrypt
-- Account lockout (5 attempts, 15-minute lockout)
-- Rate limiting (10 attempts/60s per IP)
-- Strong password requirements (8+ chars, mixed case, numbers, special chars)
-
-### Session & Data Protection
-- Secure session handling (HttpOnly, SameSite, timeout)
-- Prepared statements and input validation
-- Secure file handling and permissions
-- Environment-based configuration
-- Comprehensive error logging
 
 ## Installation
 
