@@ -21,6 +21,7 @@ require_once ROOT_PATH . '/app/Utils/Config.php';
 require_once ROOT_PATH . '/app/Utils/Logger.php';
 require_once ROOT_PATH . '/app/Utils/Security.php';
 require_once ROOT_PATH . '/app/Utils/SessionManager.php';
+require_once ROOT_PATH . '/app/Middleware/SecurityHeaders.php';
 require_once ROOT_PATH . '/app/Models/User.php';
 require_once ROOT_PATH . '/app/Models/Setting.php';
 require_once ROOT_PATH . '/app/Models/Course.php';
@@ -38,6 +39,10 @@ require_once ROOT_PATH . '/app/Models/LearningStatement.php';
 
 // Load database connection
 require_once ROOT_PATH . '/config/database.php';
+
+// Apply security headers
+$securityHeaders = new \App\Middleware\SecurityHeaders();
+$securityHeaders->handle();
 
 // Load router
 require_once ROOT_PATH . '/routes/web.php';

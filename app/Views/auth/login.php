@@ -1,8 +1,12 @@
 <?php
-$session = \App\Utils\SessionManager::getInstance();
+use App\Utils\SessionManager;
+use App\Utils\SecurityHelper;
+
+$session = SessionManager::getInstance();
 $error = $session->getFlash('error');
 $success = $session->getFlash('success');
 $sessionExpired = isset($_GET['session']) && $_GET['session'] === 'expired';
+$csrfToken = SecurityHelper::generateCsrfToken();
 ?>
 
 <!DOCTYPE html>
@@ -23,11 +27,11 @@ $sessionExpired = isset($_GET['session']) && $_GET['session'] === 'expired';
                     </div>
                     <div class="card-body">
                         <?php if ($error): ?>
-                            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+                            <div class="alert alert-danger"><?php echo SecurityHelper::sanitizeOutput($error); ?></div>
                         <?php endif; ?>
                         
                         <?php if ($success): ?>
-                            <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+                            <div class="alert alert-success"><?php echo SecurityHelper::sanitizeOutput($success); ?></div>
                         <?php endif; ?>
                         
                         <?php if ($sessionExpired): ?>
@@ -35,9 +39,12 @@ $sessionExpired = isset($_GET['session']) && $_GET['session'] === 'expired';
                         <?php endif; ?>
                         
                         <form method="POST" action="/login">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                            
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <input type="email" class="form-control" id="email" name="email" required 
+                                       value="<?php echo isset($_POST['email']) ? SecurityHelper::sanitizeOutput($_POST['email']) : ''; ?>">
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>

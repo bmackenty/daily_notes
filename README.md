@@ -61,41 +61,17 @@ Edit the `.env` file with your database credentials and other configuration valu
 ## Security Features
 
 ### Authentication & Authorization
-- Secure password storage using bcrypt
-- Account lockout after 5 failed login attempts (15-minute lockout)
-- Rate limiting (10 attempts per 60 seconds per IP)
-- Password requirements:
-  - Minimum 8 characters
-  - At least one uppercase letter
-  - At least one lowercase letter
-  - At least one number
-  - At least one special character
+- Secure password storage with bcrypt
+- Account lockout (5 attempts, 15-minute lockout)
+- Rate limiting (10 attempts/60s per IP)
+- Strong password requirements (8+ chars, mixed case, numbers, special chars)
 
-### Session Security
-- Secure session configuration with:
-  - Custom session name
-  - HttpOnly cookies
-  - SameSite cookie policy
-  - Secure cookies in production
-  - Session timeout after 1 hour of inactivity
-  - Automatic session ID regeneration every 30 minutes
-- Protection against:
-  - Session hijacking
-  - Session fixation
-  - Session sidejacking
-
-### Database Security
+### Session & Data Protection
+- Secure session handling (HttpOnly, SameSite, timeout)
+- Prepared statements and input validation
+- Secure file handling and permissions
 - Environment-based configuration
-- Secure credential storage
-- Prepared statements for all queries
-- Input validation and sanitization
-- Error logging without sensitive information
-
-### File Security
-- Secure file permissions
-- Environment file protection
-- Log file management
-- Secure upload handling
+- Comprehensive error logging
 
 ## Installation
 

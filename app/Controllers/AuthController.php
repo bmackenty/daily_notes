@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Utils\Logger;
 use App\Utils\Security;
 use App\Utils\SessionManager;
+use App\Utils\SecurityHelper;
 
 class AuthController {
     private $userModel;
@@ -36,9 +37,23 @@ class AuthController {
     
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'] ?? '';
+            // Validate CSRF token
+            if (!SecurityHelper::validateCsrfToken($_POST['csrf_token'] ?? '')) {
+                $this->session->flash('error', 'Invalid request. Please try again.');
+                header('Location: /login');
+                exit;
+            }
+
+            // Sanitize and validate input
+            $email = SecurityHelper::sanitizeInput($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
             $ip = $_SERVER['REMOTE_ADDR'];
+
+            if (!SecurityHelper::validateEmail($email)) {
+                $this->session->flash('error', 'Invalid email format.');
+                header('Location: /login');
+                exit;
+            }
             
             // Check rate limit
             if (!$this->security->checkRateLimit($ip, $email)) {
@@ -93,9 +108,23 @@ class AuthController {
     
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = $_POST['email'] ?? '';
+            // Validate CSRF token
+            if (!SecurityHelper::validateCsrfToken($_POST['csrf_token'] ?? '')) {
+                $this->session->flash('error', 'Invalid request. Please try again.');
+                header('Location: /register');
+                exit;
+            }
+
+            // Sanitize and validate input
+            $email = SecurityHelper::sanitizeInput($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
+            
+            if (!SecurityHelper::validateEmail($email)) {
+                $this->session->flash('error', 'Invalid email format.');
+                header('Location: /register');
+                exit;
+            }
             
             // Validate password
             $passwordValidation = $this->security->validatePassword($password);
