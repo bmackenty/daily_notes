@@ -59,12 +59,11 @@ class AdminController {
         }
         
         // Get daily notes count per section
-        $noteCounts = [];
+        $notes = [];
         foreach ($courses as $course) {
             $sections = $sectionModel->getAllByCourse($course['id']);
             foreach ($sections as $section) {
-                $notes = $this->noteModel->getAllBySection($section['id']);
-                $noteCounts[$section['id']] = count($notes);
+                $notes[$section['id']] = $this->noteModel->getAllBySection($section['id']);
             }
         }
         

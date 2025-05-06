@@ -1,5 +1,23 @@
 <?php require ROOT_PATH . '/app/Views/partials/header.php'; ?>
 
+<?php
+function human_timing($timestamp) {
+    $time = time() - $timestamp;
+    $tokens = array (
+        31536000 => 'year',
+        2592000 => 'month',
+        604800 => 'week',
+        86400 => 'day'
+    );
+    foreach ($tokens as $unit => $text) {
+        if ($time < $unit) continue;
+        $numberOfUnits = floor($time / $unit);
+        return $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '') . ' ago';
+    }
+    return 'today';
+}
+?>
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-12">
@@ -129,26 +147,28 @@
                                                 ?>
                                                     <tr>
                                                         <td><?= htmlspecialchars($course['name']) ?></td>
-                                                        <td><?= htmlspecialchars($section['name']) ?></td>
+                                                        <td>
+                                                            <a href="/admin/sections/<?= $section['id'] ?>/edit" class="text-decoration-none">
+                                                                <?= htmlspecialchars($section['name']) ?>
+                                                            </a>
+                                                        </td>
                                                         <td>
                                                             <?php 
                                                             if (isset($notes[$section['id']]) && !empty($notes[$section['id']])) {
                                                                 $latestNote = reset($notes[$section['id']]);
                                                                 if (isset($latestNote['date']) && $latestNote['date']) {
-                                                                    echo '<div class="d-flex align-items-center mb-2">';
-                                                                    echo '<i class="bi bi-journal-text text-success me-2"></i>';
-                                                                    echo '<a href="/courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes" ';
-                                                                    echo 'class="text-decoration-none" data-bs-toggle="tooltip" ';
-                                                                    echo 'title="View all notes for this section">';
+                                                                    $noteUrl = '/courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes';
+                                                                    echo '<span class="badge bg-light text-dark border">';
+                                                                    echo '<i class="bi bi-journal-text text-success me-1"></i>';
+                                                                    echo '<a href="' . $noteUrl . '" class="text-dark text-decoration-none" data-bs-toggle="tooltip" title="View all notes for this section">';
                                                                     echo htmlspecialchars(date('M j, Y', strtotime($latestNote['date'])));
                                                                     echo '</a>';
-                                                                    echo '</div>';
+                                                                    echo '</span>';
+                                                                } else {
+                                                                    echo '<span class="badge bg-light text-muted border"><i class="bi bi-journal-x me-1"></i>No notes yet</span>';
                                                                 }
                                                             } else {
-                                                                echo '<div class="d-flex align-items-center mb-2">';
-                                                                echo '<i class="bi bi-journal-x text-muted me-2"></i>';
-                                                                echo '<span class="text-muted">No notes yet</span>';
-                                                                echo '</div>';
+                                                                echo '<span class="badge bg-light text-muted border"><i class="bi bi-journal-x me-1"></i>No notes yet</span>';
                                                             }
                                                             ?>
                                                             <a href="/admin/sections/<?= $section['id'] ?>/notes/create" 
@@ -177,102 +197,70 @@
 
                 <!-- Courses Tab -->
                 <div class="tab-pane fade show active" id="courses">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Course Management</h2>
-                        <a href="/admin/courses/create" class="btn btn-primary">Add New Course</a>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h4 mb-0">Sections</h2>
+                        <a href="/admin/courses/create" class="btn btn-sm btn-primary">Add New Course</a>
                     </div>
 
                     <?php if (isset($_SESSION['success'])): ?>
-                        <div class="alert alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                        <div class="alert alert-success py-1 px-2 mb-2"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
                     <?php endif; ?>
 
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body p-2">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table table-sm table-hover mb-0">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Short Name</th>
-                                            <th>Teacher</th>
+                                            <th>Course</th>
+                                            <th>Section</th>
+                                            <th>Last Note</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($courses as $course): ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars($course['name']) ?></td>
-                                                <td><?= htmlspecialchars($course['short_name']) ?></td>
-                                                <td><?= htmlspecialchars($course['teacher']) ?></td>
-                                            </tr>
-                                            <?php 
+                                        <?php foreach ($courses as $course): 
                                             $sections = $sectionModel->getAllByCourse($course['id']);
-                                            if (!empty($sections)): 
-                                            ?>
-                                            <tr> 
-                                                <td colspan="4" class="p-0">
-                                                    <div class="ms-4 my-2 bg-secondary bg-opacity-10 rounded p-3">
-                                                        <table class="table table-secondary table-sm mb-0">
-                                                            <thead>
-                                                                <tr>
-                                                                  
-                                                                    <th>Name</th>
-                                                                    <th>Meeting Time</th>
-                                                                    <th>Meeting Place</th>
-                                                                    <th>Actions</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <?php foreach ($sections as $section): ?>
-                                                                <tr>
-                                                                  
-                                                                    <td>
-                                                                        <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes">
-                                                                            <?= htmlspecialchars($section['name']) ?>
-                                                                        </a>
-                                                                    </td>
-                                                                    <td><?= htmlspecialchars($section['meeting_time'] ?? '') ?></td>
-                                                                    <td><?= htmlspecialchars($section['meeting_place'] ?? '') ?></td>
-                                                                    <td>
-                                                                        <?php 
-                                                                        if (isset($notes[$section['id']]) && !empty($notes[$section['id']])) {
-                                                                            $latestNote = reset($notes[$section['id']]);
-                                                                            if (isset($latestNote['date']) && $latestNote['date']) {
-                                                                                echo '<div class="d-flex align-items-center mb-2">';
-                                                                                echo '<i class="bi bi-journal-text text-success me-2"></i>';
-                                                                                echo '<a href="/courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes" ';
-                                                                                echo 'class="text-decoration-none" data-bs-toggle="tooltip" ';
-                                                                                echo 'title="View all notes for this section">';
-                                                                                echo htmlspecialchars(date('M j, Y', strtotime($latestNote['date'])));
-                                                                                echo '</a>';
-                                                                                echo '</div>';
-                                                                            }
-                                                                        } else {
-                                                                            echo '<div class="d-flex align-items-center mb-2">';
-                                                                            echo '<i class="bi bi-journal-x text-muted me-2"></i>';
-                                                                            echo '<span class="text-muted">No notes yet</span>';
-                                                                            echo '</div>';
-                                                                        }
-                                                                        ?>
-                                                                        <a href="/admin/sections/<?= $section['id'] ?>/notes/create" 
-                                                                            class="btn btn-sm btn-success">New Daily Note</a>
-                                                                        <a href="/admin/sections/<?= $section['id'] ?>/edit" 
-                                                                           class="btn btn-sm btn-primary">Edit</a>
-                                                                        <?php if ($settings['show_delete_buttons'] === 'true'): ?>
-                                                                            <a href="/admin/sections/<?= $section['id'] ?>/delete" 
-                                                                               class="btn btn-sm btn-danger"
-                                                                               onclick="return confirm('Are you sure you want to delete this section?')">Delete</a>
-                                                                        <?php endif; ?>
-                                                                    </td>
-                                                                </tr>
-                                                                <?php endforeach; ?>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                            foreach ($sections as $section): ?>
+                                            <tr>
+                                                <td>
+                                                    <a href="/admin/courses/edit/<?= $course['id'] ?>" class="text-decoration-none">
+                                                        <?= htmlspecialchars($course['name']) ?>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="/admin/sections/<?= $section['id'] ?>/edit" class="text-decoration-none">
+                                                        <?= htmlspecialchars($section['name']) ?>
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <?php if (isset($notes[$section['id']]) && !empty($notes[$section['id']])): 
+                                                        $latestNote = reset($notes[$section['id']]);
+                                                        if (isset($latestNote['date']) && $latestNote['date']): ?>
+                                                            <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes" class="text-decoration-none d-inline-block">
+                                                                <span class="badge bg-light text-dark border">
+                                                                    <?= date('M j', strtotime($latestNote['date'])) ?>
+                                                                    <small class="text-muted">(<?= human_timing(strtotime($latestNote['date'])) ?>)</small>
+                                                                </span>
+                                                            </a>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-light text-muted border">No notes</span>
+                                                        <?php endif;
+                                                    else: ?>
+                                                        <span class="badge bg-light text-muted border">No notes</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="text-end">
+                                                    <a href="/admin/sections/<?= $section['id'] ?>/notes/create" class="btn btn-sm btn-outline-success">New Note</a>
+                                                    <a href="/admin/sections/<?= $section['id'] ?>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                    <?php if ($settings['show_delete_buttons'] === 'true'): ?>
+                                                        <a href="/admin/sections/<?= $section['id'] ?>/delete" class="btn btn-sm btn-outline-danger"
+                                                           onclick="return confirm('Delete this section?')">×</a>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
+                                            <?php endforeach;
+                                        endforeach; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -292,7 +280,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table table-sm">
                                     <thead>
                                         <tr>
                                             <th>Year</th>
@@ -451,7 +439,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table table-sm">
                                     <thead>
                                         <tr>
                                             <th>Course Name</th>
@@ -529,7 +517,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table table-sm">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
@@ -587,7 +575,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="learningStatementsTable" class="table table-striped">
+                                <table id="learningStatementsTable" class="table table-striped table-sm">
                                     <thead>
                                         <tr>
                                             <th width="100">Identifier</th>
@@ -693,6 +681,29 @@
 }
 .handle-header {
     cursor: default;
+}
+.table, .table th, .table td {
+    padding: 0.25rem !important;
+    font-size: 0.92rem;
+}
+.card-body, .card-header {
+    padding: 0.5rem 0.75rem !important;
+}
+.btn-sm {
+    padding: 0.15rem 0.5rem !important;
+    font-size: 0.85rem !important;
+}
+.badge {
+    display: inline-block;
+    position: relative;
+    z-index: 1;
+}
+.badge a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 </style>
 
