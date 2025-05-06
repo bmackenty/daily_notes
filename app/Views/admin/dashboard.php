@@ -1,6 +1,7 @@
 <?php require ROOT_PATH . '/app/Views/partials/header.php'; ?>
 
 <?php
+// Helper function for relative time display
 function human_timing($timestamp) {
     $time = time() - $timestamp;
     $tokens = array (
@@ -153,24 +154,7 @@ function human_timing($timestamp) {
                                                             </a>
                                                         </td>
                                                         <td>
-                                                            <?php 
-                                                            if (isset($notes[$section['id']]) && !empty($notes[$section['id']])) {
-                                                                $latestNote = reset($notes[$section['id']]);
-                                                                if (isset($latestNote['date']) && $latestNote['date']) {
-                                                                    $noteUrl = '/courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes';
-                                                                    echo '<span class="badge bg-light text-dark border">';
-                                                                    echo '<i class="bi bi-journal-text text-success me-1"></i>';
-                                                                    echo '<a href="' . $noteUrl . '" class="text-dark text-decoration-none" data-bs-toggle="tooltip" title="View all notes for this section">';
-                                                                    echo htmlspecialchars(date('M j, Y', strtotime($latestNote['date'])));
-                                                                    echo '</a>';
-                                                                    echo '</span>';
-                                                                } else {
-                                                                    echo '<span class="badge bg-light text-muted border"><i class="bi bi-journal-x me-1"></i>No notes yet</span>';
-                                                                }
-                                                            } else {
-                                                                echo '<span class="badge bg-light text-muted border"><i class="bi bi-journal-x me-1"></i>No notes yet</span>';
-                                                            }
-                                                            ?>
+                                               
                                                             <a href="/admin/sections/<?= $section['id'] ?>/notes/create" 
                                                                 class="btn btn-sm btn-success">New Daily Note</a>
                                                             <a href="/admin/sections/<?= $section['id'] ?>/edit" 
