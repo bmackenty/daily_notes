@@ -38,7 +38,7 @@ class AuthController {
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate CSRF token
-            if (!SecurityHelper::validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            if (!SecurityHelper::verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                 $this->session->flash('error', 'Invalid request. Please try again.');
                 header('Location: /login');
                 exit;
@@ -49,7 +49,7 @@ class AuthController {
             $password = $_POST['password'] ?? '';
             $ip = $_SERVER['REMOTE_ADDR'];
 
-            if (!SecurityHelper::validateEmail($email)) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->session->flash('error', 'Invalid email format.');
                 header('Location: /login');
                 exit;
@@ -109,7 +109,7 @@ class AuthController {
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate CSRF token
-            if (!SecurityHelper::validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            if (!SecurityHelper::verifyCsrfToken($_POST['csrf_token'] ?? '')) {
                 $this->session->flash('error', 'Invalid request. Please try again.');
                 header('Location: /register');
                 exit;
@@ -120,7 +120,7 @@ class AuthController {
             $password = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
             
-            if (!SecurityHelper::validateEmail($email)) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->session->flash('error', 'Invalid email format.');
                 header('Location: /register');
                 exit;
@@ -141,8 +141,8 @@ class AuthController {
             }
             
             // Check if registration is enabled
-            $setting = $this->settingModel->findByKey('registration_enabled');
-            if (!$setting || $setting['value'] !== '1') {
+            $registrationEnabled = $this->settingModel->get('registration_enabled');
+            if (!$registrationEnabled || $registrationEnabled !== '1') {
                 $this->session->flash('error', 'Registration is currently disabled');
                 header('Location: /register');
                 exit;

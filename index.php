@@ -19,7 +19,9 @@ ini_set('log_errors', 1);
 // Load required classes
 require_once ROOT_PATH . '/app/Utils/Config.php';
 require_once ROOT_PATH . '/app/Utils/Logger.php';
+require_once ROOT_PATH . '/app/Utils/DatabaseAdapter.php';
 require_once ROOT_PATH . '/app/Utils/Security.php';
+require_once ROOT_PATH . '/app/Utils/SecurityHelper.php';
 require_once ROOT_PATH . '/app/Utils/SessionManager.php';
 require_once ROOT_PATH . '/app/Middleware/SecurityHeaders.php';
 require_once ROOT_PATH . '/app/Models/User.php';

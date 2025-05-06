@@ -9,22 +9,49 @@ class User {
     }
     
     public function findByEmail($email) {
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+        $sql = "SELECT * FROM users WHERE email = ?";
+        $stmt = $this->db->prepare($sql);
         $stmt->execute([$email]);
-        return $stmt->fetch();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
     
     public function create($data) {
-        $stmt = $this->db->prepare("
-            INSERT INTO users (name, email, password, role, status) 
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        return $stmt->execute([
-            $data['name'],
+        $sql = "INSERT INTO users (email, password, role) VALUES (?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
             $data['email'],
-            password_hash($data['password'], PASSWORD_DEFAULT),
-            'user', // default role
-            'active' // default status
+            $data['password'],
+            $data['role'] ?? 'user'
         ]);
+        return $this->db->lastInsertId();
+    }
+
+    public function validatePassword($password) {
+        // Minimum 8 characters
+        if (strlen($password) < 8) {
+            return "Password must be at least 8 characters long";
+        }
+
+        // At least one uppercase letter
+        if (!preg_match('/[A-Z]/', $password)) {
+            return "Password must contain at least one uppercase letter";
+        }
+
+        // At least one lowercase letter
+        if (!preg_match('/[a-z]/', $password)) {
+            return "Password must contain at least one lowercase letter";
+        }
+
+        // At least one number
+        if (!preg_match('/[0-9]/', $password)) {
+            return "Password must contain at least one number";
+        }
+
+        // At least one special character
+        if (!preg_match('/[^A-Za-z0-9]/', $password)) {
+            return "Password must contain at least one special character";
+        }
+
+        return true;
     }
 } 

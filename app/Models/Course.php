@@ -20,50 +20,36 @@ class Course {
     }
     
     public function create($data) {
-        $sql = "INSERT INTO courses (name, short_name, description, policies, rules, 
-                academic_integrity, prerequisites, teacher, teacher_profile_id, google_classroom_link, 
-                meeting_notes, default_tags) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        return $this->db->prepare($sql)->execute([
+        $sql = "INSERT INTO courses (name, description, code) VALUES (?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
             $data['name'],
-            $data['short_name'],
-            $data['description'],
-            $data['policies'],
-            $data['rules'],
-            $data['academic_integrity'],
-            $data['prerequisites'],
-            $data['teacher'],
-            $data['teacher_profile_id'],
-            $data['google_classroom_link'],
-            $data['meeting_notes'],
-            $data['default_tags']
+            $data['description'] ?? null,
+            $data['code']
         ]);
+        return $this->db->lastInsertId();
+    }
+    
+    public function findByCode($code) {
+        $sql = "SELECT * FROM courses WHERE code = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$code]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
     
     public function update($id, $data) {
-        $sql = "UPDATE courses SET 
-                name = :name,
-                description = :description,
-                github_link = :github_link,
-                lms_link = :lms_link,
-                help_link = :help_link,
-                library_link = :library_link
-                WHERE id = :id";
-                
-        return $this->db->prepare($sql)->execute([
-            'id' => $id,
-            'name' => $data['name'],
-            'description' => $data['description'],
-            'github_link' => $data['github_link'] ?? null,
-            'lms_link' => $data['lms_link'] ?? null,
-            'help_link' => $data['help_link'] ?? null,
-            'library_link' => $data['library_link'] ?? null
+        $sql = "UPDATE courses SET name = ?, description = ? WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $data['name'],
+            $data['description'] ?? null,
+            $id
         ]);
     }
     
     public function delete($id) {
-        $stmt = $this->db->prepare("DELETE FROM courses WHERE id = ?");
+        $sql = "DELETE FROM courses WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
         return $stmt->execute([$id]);
     }
     
