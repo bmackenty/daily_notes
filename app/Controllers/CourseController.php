@@ -143,6 +143,10 @@ class CourseController {
             header('Location: /courses/' . $courseId . '/sections/' . $sectionId . '/notes');
             exit;
         }
+
+        // Get settings for delete button visibility
+        $settingModel = new \App\Models\Setting($this->db);
+        $settings = $settingModel->getAll();
         
         require ROOT_PATH . '/app/Views/single_note.php';
     }

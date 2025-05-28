@@ -1,5 +1,24 @@
 <?php require ROOT_PATH . '/app/Views/partials/header.php'; ?>
 
+<!-- Add TinyMCE -->
+<script src="https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        tinymce.init({
+            selector: '#content',
+            height: 600,
+            plugins: 'lists link image table code help wordcount',
+            toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
+            menubar: 'file edit view insert format tools table help',
+            setup: function(editor) {
+                editor.on('change', function() {
+                    editor.save();
+                });
+            }
+        });
+    });
+</script>
+
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-12">
@@ -14,7 +33,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h2>Edit Daily Note</h2>
+                    <h2>Edit Daily Notee</h2>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="/admin/notes/<?= $note['id'] ?>/edit" onsubmit="return validateForm()">
@@ -32,7 +51,7 @@
                         
                         <div class="mb-3">
                             <label>Content</label>
-                            <textarea id="content" name="content" class="form-control" required><?= htmlspecialchars($note['content']) ?></textarea>
+                            <textarea id="content" name="content" class="form-control" required><?= $note['content'] ?></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Update Note</button>
@@ -43,23 +62,6 @@
         </div>
     </div>
 </div>
-
-<!-- Add TinyMCE -->
-<script src="https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-<script>
-    tinymce.init({
-        selector: '#content',
-        height: 400,
-        plugins: 'lists link image table code help wordcount',
-        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
-        menubar: 'file edit view insert format tools table help',
-        setup: function(editor) {
-            editor.on('change', function() {
-                editor.save();
-            });
-        }
-    });
-</script>
 
 <script>
 function validateForm() {

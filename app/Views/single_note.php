@@ -22,9 +22,16 @@
 
             <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                 <div class="d-flex justify-content-end mb-3">
-                    <a href="/admin/notes/<?= $note['id'] ?>/edit" class="btn btn-primary">
+                    <a href="/admin/notes/<?= $note['id'] ?>/edit" class="btn btn-primary me-2">
                         <i class="bi bi-pencil"></i> Edit Note
                     </a>
+                    <?php if ($settings['show_delete_buttons'] === 'true'): ?>
+                        <a href="/admin/notes/<?= $note['id'] ?>/delete" 
+                           class="btn btn-danger"
+                           onclick="return confirm('Are you sure you want to delete this note?')">
+                            <i class="bi bi-trash"></i> Delete Note
+                        </a>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 

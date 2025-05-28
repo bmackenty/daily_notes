@@ -212,4 +212,30 @@ class Note {
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
+
+    /**
+     * Delete a note and its associated tags
+     * 
+     * @param int $id ID of the note to delete
+     * @return bool True if deletion was successful, false otherwise
+     */
+    public function delete($id) {
+        $this->db->beginTransaction();
+        try {
+            // Delete associated tags first
+            $stmt = $this->db->prepare("DELETE FROM note_tags WHERE note_id = ?");
+            $stmt->execute([$id]);
+            
+            // Delete the note
+            $stmt = $this->db->prepare("DELETE FROM notes WHERE id = ?");
+            $result = $stmt->execute([$id]);
+            
+            $this->db->commit();
+            return $result;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            error_log($e->getMessage());
+            return false;
+        }
+    }
 } 

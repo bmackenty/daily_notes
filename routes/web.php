@@ -229,6 +229,11 @@ switch ($request) {
         }
         break;
 
+    case (preg_match('/^\/admin\/notes\/(\d+)\/delete$/', $request, $matches) ? true : false):
+        $controller = new AdminController($pdo);
+        $controller->deleteNote($matches[1]);
+        break;
+
     case (preg_match('/^\/courses\/(\d+)\/tags\/([^\/]+)$/', $request, $matches) ? true : false):
         $controller = new CourseController($pdo);
         $controller->notesByTag($matches[1], urldecode($matches[2]));

@@ -630,4 +630,27 @@ class AdminController {
         header('Content-Type: application/json');
         echo json_encode(['success' => $success]);
     }
+
+    public function deleteNote($id) {
+        $note = $this->noteModel->get($id);
+        if (!$note) {
+            $_SESSION['error'] = 'Note not found';
+            header('Location: /admin/dashboard');
+            exit;
+        }
+
+        $section = $this->sectionModel->get($note['section_id']);
+        $course = $this->courseModel->get($section['course_id']);
+
+        if ($this->noteModel->delete($id)) {
+            Logger::log("Note deleted: ID $id", 'INFO');
+            $_SESSION['success'] = 'Note deleted successfully';
+        } else {
+            Logger::log("Failed to delete note ID: $id", 'ERROR');
+            $_SESSION['error'] = 'Failed to delete note';
+        }
+
+        header('Location: /courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes');
+        exit;
+    }
 } 

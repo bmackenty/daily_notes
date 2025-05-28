@@ -3,19 +3,37 @@
 <!-- Add TinyMCE -->
 <script src="https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
-    tinymce.init({
-        selector: '#content',
-        height: 400,
-        plugins: 'lists link image table code help wordcount',
-        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
-        menubar: 'file edit view insert format tools table help',
-        setup: function(editor) {
-            editor.on('change', function() {
-                editor.save(); // This saves content back to textarea
-            });
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initializing TinyMCE...');
+        tinymce.init({
+            selector: '#content',
+            height: 500,
+            plugins: 'lists link image table code help wordcount',
+            toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
+            menubar: 'file edit view insert format tools table help',
+            setup: function(editor) {
+                console.log('TinyMCE editor setup complete');
+                editor.on('change', function() {
+                    editor.save(); // This saves content back to textarea
+                });
+            }
+        }).then(function(editors) {
+            console.log('TinyMCE editors initialized:', editors);
+        }).catch(function(error) {
+            console.error('TinyMCE initialization error:', error);
+        });
     });
 </script>
+
+<style>
+    .tox-tinymce {
+        min-height: 500px !important;
+        border: 1px solid #ced4da !important;
+    }
+    #content {
+        min-height: 500px;
+    }
+</style>
 
 <div class="container mt-5">
     <div class="row">
@@ -48,7 +66,7 @@
                         
                         <div class="mb-3">
                             <label>Content</label>
-                            <textarea id="content" name="content" class="form-control" required><?= isset($lastNote) ? htmlspecialchars($lastNote['content']) : '' ?></textarea>
+                            <textarea id="content" name="content" class="form-control" required><?= isset($lastNote) ? $lastNote['content'] : '' ?></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Save Note</button>

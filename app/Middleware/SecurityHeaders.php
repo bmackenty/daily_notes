@@ -49,11 +49,11 @@ class SecurityHeaders {
         
         // Content Security Policy
         $csp = "default-src 'self'; " .
-               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; " .
-               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " .
+               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.tiny.cloud https://cdn.datatables.net https://code.jquery.com; " .
+               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6.8.5-39/skins/ui/oxide/skin.min.css https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6.8.5-39/skins/ui/oxide/content.min.css https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6.8.5-39/skins/content/default/content.min.css; " .
                "img-src 'self' data: https:; " .
                "font-src 'self' https://cdn.jsdelivr.net; " .
-               "connect-src 'self'; " .
+               "connect-src 'self' https://cdn.tiny.cloud; " .
                "frame-ancestors 'none';";
         header("Content-Security-Policy: " . $csp);
         
