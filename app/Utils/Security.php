@@ -3,14 +3,64 @@ namespace App\Utils;
 
 use App\Utils\DatabaseAdapter;
 
+/**
+ * Security
+ * 
+ * A comprehensive security management class that handles various security aspects of the application.
+ * This class implements:
+ * - Login attempt tracking and rate limiting
+ * - Account lockout system
+ * - Password validation and hashing
+ * - CSRF protection
+ * - Input sanitization
+ * - Security settings management
+ * 
+ * Security Features:
+ * - Rate limiting per IP and email
+ * - Account lockout after failed attempts
+ * - Configurable security settings
+ * - Password complexity requirements
+ * - Secure password hashing
+ * - CSRF token generation
+ * - Input sanitization
+ * 
+ * Database Tables:
+ * - login_attempts: Tracks login attempts with IP and email
+ * - security_settings: Stores configurable security parameters
+ * - users: Extended with security-related columns
+ * 
+ * Usage:
+ * $security = new Security($pdo);
+ * if ($security->checkRateLimit($ip, $email)) {
+ *     // Process login attempt
+ * }
+ */
 class Security {
+    /** @var \PDO Database connection instance */
     private $db;
+    
+    /** @var DatabaseAdapter Database adapter for driver-specific operations */
     private $dbAdapter;
+    
+    /** @var int Maximum number of failed login attempts before account lockout */
     private $maxAttempts = 5;
-    private $lockoutTime = 15; // minutes
-    private $rateLimitWindow = 60; // seconds
-    private $maxRateLimit = 10; // attempts per window
+    
+    /** @var int Account lockout duration in minutes */
+    private $lockoutTime = 15;
+    
+    /** @var int Rate limit window in seconds */
+    private $rateLimitWindow = 60;
+    
+    /** @var int Maximum number of login attempts per rate limit window */
+    private $maxRateLimit = 10;
 
+    /**
+     * Constructor - initializes security system
+     * Creates necessary database tables and columns
+     * Loads security settings from database
+     * 
+     * @param \PDO $db Database connection instance
+     */
     public function __construct($db) {
         $this->db = $db;
         $this->dbAdapter = new DatabaseAdapter($db);
@@ -18,16 +68,28 @@ class Security {
         $this->initializeSettings();
     }
 
+    /**
+     * Checks and creates necessary security-related database tables and columns
+     * Creates tables if they don't exist:
+     * - login_attempts: For tracking login attempts
+     * - security_settings: For storing security configuration
+     * Adds security columns to users table if they don't exist
+     * 
+     * @throws \PDOException If database operations fail
+     */
     private function checkAndCreateTables() {
         try {
+            // Create login_attempts table if it doesn't exist
             if (!$this->dbAdapter->tableExists('login_attempts')) {
                 $this->createLoginAttemptsTable();
             }
 
+            // Create security_settings table if it doesn't exist
             if (!$this->dbAdapter->tableExists('security_settings')) {
                 $this->createSecuritySettingsTable();
             }
 
+            // Add security columns to users table if they don't exist
             if (!$this->dbAdapter->columnExists('users', 'failed_login_attempts')) {
                 $this->addSecurityColumnsToUsers();
             }
@@ -36,6 +98,16 @@ class Security {
         }
     }
 
+    /**
+     * Creates the login_attempts table
+     * Stores information about login attempts including:
+     * - IP address
+     * - Email address
+     * - Attempt timestamp
+     * - Success status
+     * 
+     * Uses a unique constraint on IP and email combination
+     */
     private function createLoginAttemptsTable() {
         $sql = "CREATE TABLE IF NOT EXISTS login_attempts (
             id INTEGER PRIMARY KEY " . $this->dbAdapter->getAutoIncrement() . ",
@@ -48,7 +120,16 @@ class Security {
         $this->db->exec($sql);
     }
 
+    /**
+     * Creates the security_settings table and populates it with default values
+     * Stores configurable security parameters including:
+     * - Maximum login attempts
+     * - Lockout duration
+     * - Rate limiting settings
+     * - Password requirements
+     */
     private function createSecuritySettingsTable() {
+        // Create table structure
         $sql = "CREATE TABLE IF NOT EXISTS security_settings (
             id INTEGER PRIMARY KEY " . $this->dbAdapter->getAutoIncrement() . ",
             setting_key TEXT NOT NULL UNIQUE,
@@ -59,7 +140,7 @@ class Security {
         )";
         $this->db->exec($sql);
 
-        // Insert default settings
+        // Default security settings
         $defaultSettings = [
             ['max_login_attempts', '5', 'Maximum number of failed login attempts before account lockout'],
             ['lockout_duration', '15', 'Account lockout duration in minutes'],
@@ -72,6 +153,7 @@ class Security {
             ['password_require_special', '1', 'Password must contain special characters']
         ];
 
+        // Insert default settings using INSERT IGNORE to prevent duplicates
         $stmt = $this->db->prepare("
             " . $this->dbAdapter->getInsertIgnore() . " INTO security_settings (setting_key, setting_value, description)
             VALUES (?, ?, ?)
@@ -82,6 +164,16 @@ class Security {
         }
     }
 
+    /**
+     * Adds security-related columns to the users table
+     * New columns include:
+     * - failed_login_attempts: Counter for failed login attempts
+     * - last_failed_login: Timestamp of last failed login
+     * - account_locked_until: Account lockout expiration
+     * - password_reset_token: Token for password reset
+     * - password_reset_expires: Password reset token expiration
+     * - last_password_change: Last password change timestamp
+     */
     private function addSecurityColumnsToUsers() {
         $sql = "ALTER TABLE users 
             ADD COLUMN failed_login_attempts INTEGER DEFAULT 0,
@@ -93,29 +185,48 @@ class Security {
         $this->db->exec($sql);
     }
 
+    /**
+     * Initializes security settings from the database
+     * Loads configurable parameters:
+     * - Maximum login attempts
+     * - Lockout duration
+     * - Rate limit window
+     * - Maximum rate limit
+     * Falls back to default values if settings are not found
+     */
     private function initializeSettings() {
         try {
-            // Check if security_settings table exists
+            // Load settings from database if table exists
             $stmt = $this->db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='security_settings'");
             if ($stmt->rowCount() > 0) {
                 $stmt = $this->db->query("SELECT setting_key, setting_value FROM security_settings");
                 $settings = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
                 
+                // Update class properties with database values or use defaults
                 $this->maxAttempts = $settings['max_login_attempts'] ?? $this->maxAttempts;
                 $this->lockoutTime = $settings['lockout_duration'] ?? $this->lockoutTime;
                 $this->rateLimitWindow = $settings['rate_limit_window'] ?? $this->rateLimitWindow;
                 $this->maxRateLimit = $settings['max_rate_limit'] ?? $this->maxRateLimit;
             }
         } catch (\PDOException $e) {
-            // If tables don't exist yet, use default values
+            // Use default values if settings can't be loaded
             error_log("Security settings not initialized: " . $e->getMessage());
         }
     }
 
+    /**
+     * Checks if a login attempt is within rate limits
+     * Prevents brute force attacks by limiting attempts per IP
+     * 
+     * @param string $ip IP address of the attempt
+     * @param string $email Email address of the attempt
+     * @return bool True if within rate limits, false if rate limit exceeded
+     */
     public function checkRateLimit($ip, $email) {
         try {
             $windowStart = date('Y-m-d H:i:s', time() - $this->rateLimitWindow);
             
+            // Count attempts within the rate limit window
             $stmt = $this->db->prepare("
                 SELECT COUNT(*) as attempts 
                 FROM login_attempts 
@@ -127,12 +238,20 @@ class Security {
             
             return $result['attempts'] < $this->maxRateLimit;
         } catch (\PDOException $e) {
-            // If table doesn't exist yet, allow the attempt
+            // Allow attempt if rate limit check fails
             error_log("Rate limit check failed: " . $e->getMessage());
             return true;
         }
     }
 
+    /**
+     * Records a login attempt in the database
+     * Tracks IP address, email, and success status
+     * 
+     * @param string $ip IP address of the attempt
+     * @param string $email Email address of the attempt
+     * @param bool $success Whether the login attempt was successful
+     */
     public function recordLoginAttempt($ip, $email, $success) {
         try {
             $stmt = $this->db->prepare("
@@ -145,6 +264,12 @@ class Security {
         }
     }
 
+    /**
+     * Checks if an account is currently locked
+     * 
+     * @param string $email Email address to check
+     * @return string|false Returns lockout expiration time if locked, false if not locked
+     */
     public function checkAccountLockout($email) {
         try {
             $stmt = $this->db->prepare("
@@ -157,6 +282,7 @@ class Security {
 
             if (!$user) return false;
 
+            // Check if account is still locked
             if ($user['account_locked_until'] && strtotime($user['account_locked_until']) > time()) {
                 return $user['account_locked_until'];
             }
@@ -168,8 +294,15 @@ class Security {
         }
     }
 
+    /**
+     * Increments the failed login attempts counter for a user
+     * Locks the account if maximum attempts are exceeded
+     * 
+     * @param string $email Email address of the user
+     */
     public function incrementFailedAttempts($email) {
         try {
+            // Increment failed attempts counter
             $stmt = $this->db->prepare("
                 UPDATE users 
                 SET failed_login_attempts = failed_login_attempts + 1,
@@ -178,7 +311,7 @@ class Security {
             ");
             $stmt->execute([$email]);
 
-            // Check if we should lock the account
+            // Check if account should be locked
             $stmt = $this->db->prepare("
                 SELECT failed_login_attempts 
                 FROM users 
@@ -187,6 +320,7 @@ class Security {
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
+            // Lock account if maximum attempts exceeded
             if ($user['failed_login_attempts'] >= $this->maxAttempts) {
                 $this->lockAccount($email);
             }
@@ -195,6 +329,11 @@ class Security {
         }
     }
 
+    /**
+     * Locks a user account for the configured lockout duration
+     * 
+     * @param string $email Email address of the user to lock
+     */
     public function lockAccount($email) {
         try {
             $lockoutUntil = date('Y-m-d H:i:s', time() + ($this->lockoutTime * 60));
@@ -210,6 +349,12 @@ class Security {
         }
     }
 
+    /**
+     * Resets the failed login attempts counter for a user
+     * Clears lockout status and last failed login timestamp
+     * 
+     * @param string $email Email address of the user
+     */
     public function resetFailedAttempts($email) {
         try {
             $stmt = $this->db->prepare("
@@ -225,6 +370,18 @@ class Security {
         }
     }
 
+    /**
+     * Validates a password against security requirements
+     * Checks for:
+     * - Minimum length (8 characters)
+     * - Uppercase letters
+     * - Lowercase letters
+     * - Numbers
+     * - Special characters
+     * 
+     * @param string $password Password to validate
+     * @return true|string Returns true if valid, error message if invalid
+     */
     public function validatePassword($password) {
         // Minimum 8 characters
         if (strlen($password) < 8) {
@@ -254,10 +411,24 @@ class Security {
         return true;
     }
 
+    /**
+     * Securely hashes a password using PHP's password_hash
+     * Uses the default algorithm (currently bcrypt)
+     * 
+     * @param string $password Password to hash
+     * @return string Hashed password
+     */
     public function hashPassword($password) {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
+    /**
+     * Generates a CSRF token for form protection
+     * Creates a new token if one doesn't exist in the session
+     * Uses cryptographically secure random bytes
+     * 
+     * @return string CSRF token
+     */
     public function generateCsrfToken() {
         if (empty($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -265,6 +436,14 @@ class Security {
         return $_SESSION['csrf_token'];
     }
 
+    /**
+     * Sanitizes user input to prevent XSS attacks
+     * Handles both string and array inputs
+     * Uses htmlspecialchars with ENT_QUOTES for maximum security
+     * 
+     * @param string|array $input Input to sanitize
+     * @return string|array Sanitized input
+     */
     public function sanitizeInput($input) {
         if (is_array($input)) {
             return array_map([$this, 'sanitizeInput'], $input);
