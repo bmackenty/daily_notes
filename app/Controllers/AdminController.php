@@ -12,15 +12,41 @@ use DateTime;
 use App\Models\TeacherProfile;
 use App\Models\LearningStatement;
 
+/**
+ * AdminController
+ * 
+ * This controller handles all administrative operations in the application.
+ * It manages courses, sections, notes, academic years, weekly plans, teacher profiles,
+ * and learning statements. All methods require admin privileges to access.
+ */
 class AdminController {
+    /** @var Setting Model for managing application settings */
     private $settingModel;
+    
+    /** @var Course Model for managing courses */
     private $courseModel;
+    
+    /** @var Section Model for managing course sections */
     private $sectionModel;
+    
+    /** @var Note Model for managing daily notes */
     private $noteModel;
+    
+    /** @var \PDO Database connection instance */
     private $db;
+    
+    /** @var TeacherProfile Model for managing teacher profiles */
     private $teacherProfileModel;
+    
+    /** @var LearningStatement Model for managing learning statements */
     private $learningStatementModel;
     
+    /**
+     * Constructor - initializes models and checks admin privileges
+     * 
+     * @param \PDO $db Database connection instance
+     * @throws \Exception If user is not logged in or not an admin
+     */
     public function __construct($db) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -42,6 +68,10 @@ class AdminController {
         $this->learningStatementModel = new LearningStatement($db);
     }
     
+    /**
+     * Displays the admin dashboard with overview of all system components
+     * Shows courses, sections, notes, teacher profiles, and learning statements
+     */
     public function dashboard() {
         $settings = $this->settingModel->getAll();
         $courses = $this->courseModel->getAll();
@@ -79,6 +109,10 @@ class AdminController {
         require ROOT_PATH . '/app/Views/admin/dashboard.php';
     }
 
+    /**
+     * Lists all courses and their associated sections
+     * Used for course management interface
+     */
     public function courses() {
         $courses = $this->courseModel->getAll();
         $sectionModel = $this->sectionModel;
@@ -89,6 +123,10 @@ class AdminController {
         require ROOT_PATH . '/app/Views/admin/courses/index.php';
     }
 
+    /**
+     * Creates a new course
+     * Handles both GET (display form) and POST (process creation) requests
+     */
     public function createCourse() {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $teacherProfiles = $this->teacherProfileModel->getAll();
@@ -106,6 +144,12 @@ class AdminController {
         }
     }
 
+    /**
+     * Edits an existing course
+     * Handles both GET (display form) and POST (process update) requests
+     * 
+     * @param int $id Course ID to edit
+     */
     public function editCourse($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $course = $this->courseModel->get($id);
@@ -124,6 +168,11 @@ class AdminController {
         }
     }
 
+    /**
+     * Deletes a course and logs the action
+     * 
+     * @param int $id Course ID to delete
+     */
     public function deleteCourse($id) {
         $course = $this->courseModel->get($id);
         if ($this->courseModel->delete($id)) {
@@ -137,6 +186,10 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Updates application-wide settings
+     * Handles registration, max notes, maintenance mode, and delete button visibility
+     */
     public function updateSettings() {
         // Registration setting
         $registration = isset($_POST['registration_enabled']) ? 'true' : 'false';
@@ -155,6 +208,11 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Lists all sections for a specific course
+     * 
+     * @param int $courseId ID of the course to list sections for
+     */
     public function sections($courseId) {
         $course = $this->courseModel->get($courseId);
         $sections = $this->sectionModel->getAllByCourse($courseId);
@@ -162,6 +220,12 @@ class AdminController {
         require ROOT_PATH . '/app/Views/admin/sections/index.php';
     }
 
+    /**
+     * Creates a new section for a course
+     * Handles both GET (display form) and POST (process creation) requests
+     * 
+     * @param int $courseId ID of the course to create section for
+     */
     public function createSection($courseId) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $course = $this->courseModel->get($courseId);
@@ -180,6 +244,12 @@ class AdminController {
         }
     }
 
+    /**
+     * Edits an existing section
+     * Handles both GET (display form) and POST (process update) requests
+     * 
+     * @param int $id Section ID to edit
+     */
     public function editSection($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $section = $this->sectionModel->get($id);
@@ -199,6 +269,11 @@ class AdminController {
         }
     }
 
+    /**
+     * Deletes a section and logs the action
+     * 
+     * @param int $id Section ID to delete
+     */
     public function deleteSection($id) {
         $section = $this->sectionModel->get($id);
         $courseId = $section['course_id'];
@@ -213,6 +288,12 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Creates a new daily note for a section
+     * Handles both GET (display form) and POST (process creation) requests
+     * 
+     * @param int $sectionId ID of the section to create note for
+     */
     public function createNote($sectionId) {
         error_log("Method hit: createNote with sectionId: $sectionId");
         error_log("Request method: " . $_SERVER['REQUEST_METHOD']);
@@ -242,12 +323,20 @@ class AdminController {
         }
     }
 
+    /**
+     * Manages academic years
+     * Lists all academic years and their status
+     */
     public function academicYears() {
         $academicYearModel = new AcademicYear($this->db);
         $academicYears = $academicYearModel->getAll();
         require ROOT_PATH . '/app/Views/admin/settings/academic_years.php';
     }
 
+    /**
+     * Creates a new academic year
+     * Calculates number of weeks based on start and end dates
+     */
     public function createAcademicYear() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $start = new DateTime($_POST['start_date']);
@@ -266,6 +355,10 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Sets an academic year as the active one
+     * Only one academic year can be active at a time
+     */
     public function setActiveAcademicYear() {
         $academicYearModel = new AcademicYear($this->db);
         if ($academicYearModel->setActive($_POST['id'])) {
@@ -275,6 +368,12 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Edits an existing academic year
+     * Recalculates number of weeks based on new dates
+     * 
+     * @param int $id Academic year ID to edit
+     */
     public function editAcademicYear($id) {
         $academicYearModel = new AcademicYear($this->db);
         
@@ -299,6 +398,13 @@ class AdminController {
             exit;
         }
     }
+
+    /**
+     * Edits an existing note
+     * Handles both GET (display form) and POST (process update) requests
+     * 
+     * @param int $id Note ID to edit
+     */
     public function editNote($id) {
         $note = $this->noteModel->get($id);
         if (!$note) {
@@ -331,6 +437,13 @@ class AdminController {
             exit;
         }
     }
+
+    /**
+     * Lists weekly plans for a course
+     * Requires an active academic year with defined weeks
+     * 
+     * @param int $courseId ID of the course to list plans for
+     */
     public function weeklyPlans($courseId) {
         $course = $this->courseModel->get($courseId);
         if (!$course) {
@@ -365,6 +478,12 @@ class AdminController {
         require ROOT_PATH . '/app/Views/admin/courses/weekly_plans.php';
     }
 
+    /**
+     * Updates or creates a weekly plan for a course and week
+     * 
+     * @param int $courseId ID of the course
+     * @param int $weekId ID of the academic week
+     */
     public function updateWeeklyPlan($courseId, $weekId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /admin/courses/' . $courseId . '/weekly-plans');
@@ -401,6 +520,12 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Displays form to edit a weekly plan
+     * 
+     * @param int $courseId ID of the course
+     * @param int $weekId ID of the academic week
+     */
     public function editWeeklyPlan($courseId, $weekId) {
         $course = $this->courseModel->get($courseId);
         if (!$course) {
@@ -430,6 +555,12 @@ class AdminController {
         require ROOT_PATH . '/app/Views/admin/courses/edit_weekly_plan.php';
     }
 
+    /**
+     * Displays form to create a new weekly plan
+     * 
+     * @param int $courseId ID of the course
+     * @param int $weekId ID of the academic week
+     */
     public function createWeeklyPlan($courseId, $weekId) {
         $course = $this->courseModel->get($courseId);
         if (!$course) {
@@ -450,6 +581,12 @@ class AdminController {
         require ROOT_PATH . '/app/Views/admin/courses/create_weekly_plan.php';
     }
 
+    /**
+     * Stores a new weekly plan
+     * 
+     * @param int $courseId ID of the course
+     * @param int $weekId ID of the academic week
+     */
     public function storeWeeklyPlan($courseId, $weekId) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /admin/courses/' . $courseId . '/weekly-plans');
@@ -480,6 +617,11 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Updates an existing note
+     * 
+     * @param int $id Note ID to update
+     */
     public function updateNote($id) {
         $note = $this->noteModel->get($id);
         $section = $this->sectionModel->get($note['section_id']);
@@ -497,6 +639,11 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Creates a new teacher profile
+     * Handles both GET (display form) and POST (process creation) requests
+     * Includes profile picture upload functionality
+     */
     public function createTeacherProfile() {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             require ROOT_PATH . '/app/Views/admin/teacher_profiles/create.php';
@@ -526,6 +673,13 @@ class AdminController {
         }
     }
 
+    /**
+     * Edits an existing teacher profile
+     * Handles both GET (display form) and POST (process update) requests
+     * Includes profile picture upload functionality
+     * 
+     * @param int $id Teacher profile ID to edit
+     */
     public function editTeacherProfile($id) {
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $profile = $this->teacherProfileModel->get($id);
@@ -556,6 +710,13 @@ class AdminController {
         }
     }
 
+    /**
+     * Deletes a teacher profile
+     * Returns JSON response for AJAX requests
+     * 
+     * @param int $id Teacher profile ID to delete
+     * @return string JSON response indicating success or failure
+     */
     public function deleteTeacherProfile($id) {
         $profile = $this->teacherProfileModel->get($id);
         if ($this->teacherProfileModel->delete($id)) {
@@ -567,6 +728,12 @@ class AdminController {
         }
     }
 
+    /**
+     * Retrieves a teacher profile by ID
+     * Returns JSON response for AJAX requests
+     * 
+     * @param int $id Teacher profile ID to retrieve
+     */
     public function getTeacherProfile($id) {
         $profile = $this->teacherProfileModel->get($id);
         if ($profile) {
@@ -579,6 +746,11 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Displays form to create a new note
+     * 
+     * @param int $sectionId ID of the section to create note for
+     */
     public function createNoteForm($sectionId) {
         $section = $this->sectionModel->get($sectionId);
         $course = $this->courseModel->get($section['course_id']);
@@ -587,6 +759,9 @@ class AdminController {
         require ROOT_PATH . '/app/Views/admin/notes/create.php';
     }
 
+    /**
+     * Creates a new learning statement
+     */
     public function createLearningStatement() {
         if ($this->learningStatementModel->create($_POST)) {
             $_SESSION['success'] = 'Learning statement created successfully';
@@ -597,6 +772,11 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Edits an existing learning statement
+     * 
+     * @param int $id Learning statement ID to edit
+     */
     public function editLearningStatement($id) {
         if ($this->learningStatementModel->update($id, $_POST)) {
             $_SESSION['success'] = 'Learning statement updated successfully';
@@ -607,11 +787,23 @@ class AdminController {
         exit;
     }
 
+    /**
+     * Deletes a learning statement
+     * Returns JSON response for AJAX requests
+     * 
+     * @param int $id Learning statement ID to delete
+     * @return string JSON response indicating success or failure
+     */
     public function deleteLearningStatement($id) {
         $success = $this->learningStatementModel->delete($id);
         return json_encode(['success' => $success]);
     }
 
+    /**
+     * Reorders learning statements
+     * Handles AJAX requests to update statement positions
+     * Returns JSON response indicating success or failure
+     */
     public function reorderLearningStatements() {
         $data = json_decode(file_get_contents('php://input'), true);
         $success = true;
@@ -631,6 +823,11 @@ class AdminController {
         echo json_encode(['success' => $success]);
     }
 
+    /**
+     * Deletes a note
+     * 
+     * @param int $id Note ID to delete
+     */
     public function deleteNote($id) {
         $note = $this->noteModel->get($id);
         if (!$note) {

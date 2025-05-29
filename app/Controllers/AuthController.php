@@ -8,13 +8,39 @@ use App\Utils\Security;
 use App\Utils\SessionManager;
 use App\Utils\SecurityHelper;
 
+/**
+ * AuthController
+ * 
+ * Handles all authentication-related operations including login, registration, and logout.
+ * Implements security features such as:
+ * - CSRF protection
+ * - Rate limiting
+ * - Account lockout
+ * - Password validation
+ * - Session management
+ * - Input sanitization
+ */
 class AuthController {
+    /** @var User Model for user operations */
     private $userModel;
+    
+    /** @var Setting Model for application settings */
     private $settingModel;
+    
+    /** @var Security Utility for security-related operations */
     private $security;
+    
+    /** @var \PDO Database connection instance */
     private $db;
+    
+    /** @var SessionManager Utility for session management */
     private $session;
     
+    /**
+     * Constructor - initializes models and utilities
+     * 
+     * @param \PDO $db Database connection instance
+     */
     public function __construct($db) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -26,15 +52,33 @@ class AuthController {
         $this->session = SessionManager::getInstance();
     }
     
+    /**
+     * Displays the login form
+     */
     public function showLogin() {
         require ROOT_PATH . '/app/Views/auth/login.php';
     }
     
+    /**
+     * Displays the registration form
+     * Checks if registration is enabled in settings
+     */
     public function showRegister() {
         $registrationEnabled = $this->settingModel->get('registration_enabled') === 'true';
         require ROOT_PATH . '/app/Views/auth/register.php';
     }
     
+    /**
+     * Handles user login
+     * Implements security measures:
+     * - CSRF token validation
+     * - Input sanitization
+     * - Rate limiting
+     * - Account lockout
+     * - Password verification
+     * - Session management
+     * - Login attempt logging
+     */
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate CSRF token
@@ -49,34 +93,36 @@ class AuthController {
             $password = $_POST['password'] ?? '';
             $ip = $_SERVER['REMOTE_ADDR'];
 
+            // Validate email format
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->session->flash('error', 'Invalid email format.');
                 header('Location: /login');
                 exit;
             }
             
-            // Check rate limit
+            // Check rate limiting to prevent brute force attacks
             if (!$this->security->checkRateLimit($ip, $email)) {
                 $this->session->flash('error', 'Too many login attempts. Please try again later.');
                 header('Location: /login');
                 exit;
             }
             
-            // Check account lockout
+            // Check if account is locked due to too many failed attempts
             if ($lockoutUntil = $this->security->checkAccountLockout($email)) {
                 $this->session->flash('error', 'Account is locked until ' . date('Y-m-d H:i:s', strtotime($lockoutUntil)));
                 header('Location: /login');
                 exit;
             }
             
+            // Verify user credentials
             $user = $this->userModel->findByEmail($email);
             
             if ($user && password_verify($password, $user['password'])) {
-                // Record successful login
+                // Record successful login and reset failed attempts
                 $this->security->recordLoginAttempt($ip, $email, true);
                 $this->security->resetFailedAttempts($email);
                 
-                // Set session variables
+                // Set session variables for authenticated user
                 $this->session->set('user_id', $user['id']);
                 $this->session->set('user_email', $user['email']);
                 $this->session->set('user_role', $user['role']);
@@ -84,6 +130,7 @@ class AuthController {
                 
                 Logger::log("User {$user['email']} logged in successfully", 'INFO');
                 
+                // Redirect based on user role
                 if ($user['role'] === 'admin') {
                     header('Location: /admin/dashboard');
                 } else {
@@ -91,7 +138,7 @@ class AuthController {
                 }
                 exit;
             } else {
-                // Record failed login
+                // Record failed login attempt and increment counter
                 $this->security->recordLoginAttempt($ip, $email, false);
                 $this->security->incrementFailedAttempts($email);
                 
@@ -106,6 +153,16 @@ class AuthController {
         require_once ROOT_PATH . '/app/Views/auth/login.php';
     }
     
+    /**
+     * Handles user registration
+     * Implements security measures:
+     * - CSRF token validation
+     * - Input sanitization
+     * - Password validation
+     * - Registration status check
+     * - Email uniqueness check
+     * - Secure password hashing
+     */
     public function register() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate CSRF token
@@ -120,13 +177,14 @@ class AuthController {
             $password = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
             
+            // Validate email format
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->session->flash('error', 'Invalid email format.');
                 header('Location: /register');
                 exit;
             }
             
-            // Validate password
+            // Validate password strength
             $passwordValidation = $this->security->validatePassword($password);
             if ($passwordValidation !== true) {
                 $this->session->flash('error', $passwordValidation);
@@ -134,13 +192,14 @@ class AuthController {
                 exit;
             }
             
+            // Verify password confirmation
             if ($password !== $confirmPassword) {
                 $this->session->flash('error', 'Passwords do not match');
                 header('Location: /register');
                 exit;
             }
             
-            // Check if registration is enabled
+            // Check if registration is enabled in settings
             $registrationEnabled = $this->settingModel->get('registration_enabled');
             if (!$registrationEnabled || $registrationEnabled !== '1') {
                 $this->session->flash('error', 'Registration is currently disabled');
@@ -148,14 +207,14 @@ class AuthController {
                 exit;
             }
             
-            // Check if email already exists
+            // Check for existing email
             if ($this->userModel->findByEmail($email)) {
                 $this->session->flash('error', 'Email already registered');
                 header('Location: /register');
                 exit;
             }
             
-            // Create user
+            // Create new user with hashed password
             $userId = $this->userModel->create([
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
@@ -177,6 +236,10 @@ class AuthController {
         require_once ROOT_PATH . '/app/Views/auth/register.php';
     }
     
+    /**
+     * Handles user logout
+     * Destroys the session and redirects to login page
+     */
     public function logout() {
         $this->session->destroySession();
         header('Location: /login');
