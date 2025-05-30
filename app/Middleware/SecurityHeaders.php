@@ -86,7 +86,7 @@ class SecurityHeaders {
         // Defines allowed sources for scripts, styles, images, fonts, and connections
         $csp = "default-src 'self'; " . // Default fallback for all resource types
                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.tiny.cloud https://cdn.datatables.net https://code.jquery.com; " . // Allowed script sources
-               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6.8.5-39/skins/ui/oxide/skin.min.css https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6.8.5-39/skins/ui/oxide/content.min.css https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6.8.5-39/skins/content/default/content.min.css; " . // Allowed style sources
+               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://cdn.tiny.cloud; " . // Allowed style sources
                "img-src 'self' data: https:; " . // Allowed image sources
                "font-src 'self' https://cdn.jsdelivr.net; " . // Allowed font sources
                "connect-src 'self' https://cdn.tiny.cloud; " . // Allowed connection endpoints
