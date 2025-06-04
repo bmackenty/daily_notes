@@ -58,7 +58,7 @@ switch ($request) {
         break;
         
     case '/dashboard':
-        // Add dashboard route here
+        // Handle dashboard route
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['error'] = 'Please login to access dashboard';
             header('Location: /login');
