@@ -43,7 +43,7 @@ class SecurityHeaders {
     private function shouldForceHttps() {
         return $this->config->get('APP_ENV') === 'production' && 
                !isset($_SERVER['HTTPS']) && 
-               $_SERVER['HTTP_X_FORWARDED_PROTO'] !== 'https';
+               (!isset($_SERVER['HTTP_X_FORWARDED_PROTO']) || $_SERVER['HTTP_X_FORWARDED_PROTO'] !== 'https');
     }
 
     /**
