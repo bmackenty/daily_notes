@@ -21,7 +21,7 @@ class TestHelper {
      */
     public static function createTestUser($overrides = []) {
         return array_merge([
-            'username' => 'testuser',
+            'name' => 'testuser',
             'email' => 'test@example.com',
             'password' => 'Test123!',
             'role' => 'teacher'
