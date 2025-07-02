@@ -47,7 +47,7 @@ class HomeController {
      * Shows hierarchical structure of:
      * - All courses
      * - Sections within each course
-     * - Notes within each section
+     * - Notes within each section (filtered by academic year for students)
      * 
      * This method builds a nested data structure that represents the entire
      * course hierarchy for display on the home page.
@@ -58,6 +58,13 @@ class HomeController {
         $sections = [];
         $notes = [];
         
+        // Determine if user is admin
+        $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+        
+        // Get active academic year for filtering
+        $academicYearModel = new \App\Models\AcademicYear($this->pdo);
+        $activeYear = $academicYearModel->getActive();
+        
         // Build hierarchical data structure
         foreach ($courses as $course) {
             // Get all sections for each course
@@ -65,7 +72,13 @@ class HomeController {
             
             // Get all notes for each section
             foreach ($sections[$course['id']] as $section) {
-                $notes[$section['id']] = $this->noteModel->getAllBySection($section['id']);
+                if ($isAdmin) {
+                    // Admins see all notes
+                    $notes[$section['id']] = $this->noteModel->getAllBySection($section['id']);
+                } else {
+                    // Students only see notes from active academic year
+                    $notes[$section['id']] = $this->noteModel->getAllBySection($section['id'], $activeYear ? $activeYear['id'] : null);
+                }
             }
         }
         

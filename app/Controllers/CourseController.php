@@ -95,6 +95,8 @@ class CourseController {
     /**
      * Displays all notes for a specific section within a course
      * Notes are sorted by date in descending order (newest first)
+     * For students, only shows notes from the active academic year
+     * For admins, shows all notes
      * 
      * @param int $courseId ID of the course
      * @param int $sectionId ID of the section
@@ -110,8 +112,29 @@ class CourseController {
             exit;
         }
 
-        // Get and sort notes
-        $notes = $this->noteModel->getAllBySection($sectionId);
+        // Determine if user is admin (unauthenticated users are treated as students)
+        $isAdmin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
+        
+        // Get active academic year for filtering
+        $academicYearModel = new AcademicYear($this->db);
+        $activeYear = $academicYearModel->getActive();
+        
+        // Debug information
+        error_log("User role: " . ($_SESSION['user_role'] ?? 'NOT_LOGGED_IN'));
+        error_log("Is admin: " . ($isAdmin ? 'YES' : 'NO'));
+        error_log("Active year ID: " . ($activeYear ? $activeYear['id'] : 'NULL'));
+        
+        // Get notes - filter by active academic year for students
+        if ($isAdmin) {
+            // Admins see all notes
+            $notes = $this->noteModel->getAllBySection($sectionId);
+            error_log("Admin view: Showing all notes (" . count($notes) . " total)");
+        } else {
+            // Students only see notes from active academic year
+            $notes = $this->noteModel->getAllBySection($sectionId, $activeYear ? $activeYear['id'] : null);
+            error_log("Student view: Showing filtered notes (" . count($notes) . " from current year)");
+        }
+        
         usort($notes, function($a, $b) {
             return strtotime($b['date']) - strtotime($a['date']);
         });
@@ -179,6 +202,7 @@ class CourseController {
     /**
      * Displays notes filtered by tag for a specific course
      * Includes tag cloud for navigation
+     * For students, only shows notes from the active academic year
      * 
      * @param int $courseId ID of the course
      * @param string $tagName Name of the tag to filter by
@@ -192,10 +216,24 @@ class CourseController {
             exit;
         }
 
+        // Determine if user is admin (unauthenticated users are treated as students)
+        $isAdmin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
+        
+        // Get active academic year for filtering
+        $academicYearModel = new AcademicYear($this->db);
+        $activeYear = $academicYearModel->getActive();
+
         // Get notes and tag cloud
         $tagModel = new Tag($this->db);
-        $notes = $tagModel->getNotesByTag($tagName, $courseId);
-        $tagCloud = $tagModel->getTagCloud($courseId);
+        if ($isAdmin) {
+            // Admins see all notes
+            $notes = $tagModel->getNotesByTag($tagName, $courseId);
+            $tagCloud = $tagModel->getTagCloud($courseId);
+        } else {
+            // Students only see notes from active academic year
+            $notes = $tagModel->getNotesByTag($tagName, $courseId, $activeYear ? $activeYear['id'] : null);
+            $tagCloud = $tagModel->getTagCloud($courseId, $activeYear ? $activeYear['id'] : null);
+        }
 
         require ROOT_PATH . '/app/Views/notes_by_tag.php';
     }
@@ -203,6 +241,7 @@ class CourseController {
     /**
      * Displays a single note with its details
      * Includes course and section context
+     * For students, only allows access to notes from the active academic year
      * 
      * @param int $courseId ID of the course
      * @param int $sectionId ID of the section
@@ -218,6 +257,21 @@ class CourseController {
             $_SESSION['error'] = 'Note not found';
             header('Location: /courses/' . $courseId . '/sections/' . $sectionId . '/notes');
             exit;
+        }
+
+        // Check if user is admin (unauthenticated users are treated as students)
+        $isAdmin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
+        
+        // For students, verify the note belongs to the active academic year
+        if (!$isAdmin) {
+            $academicYearModel = new AcademicYear($this->db);
+            $activeYear = $academicYearModel->getActive();
+            
+            if (!$activeYear || $note['academic_year_id'] != $activeYear['id']) {
+                $_SESSION['error'] = 'Note not found or not accessible';
+                header('Location: /courses/' . $courseId . '/sections/' . $sectionId . '/notes');
+                exit;
+            }
         }
 
         // Get settings for UI customization (e.g., delete button visibility)
@@ -339,7 +393,20 @@ class CourseController {
         $notes = [];
         
         if (!empty($query)) {
-            $notes = $this->noteModel->search($query, $sectionId);
+            // Determine if user is admin (unauthenticated users are treated as students)
+            $isAdmin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
+            
+            // Get active academic year for filtering
+            $academicYearModel = new AcademicYear($this->db);
+            $activeYear = $academicYearModel->getActive();
+            
+            if ($isAdmin) {
+                // Admins can search all notes
+                $notes = $this->noteModel->search($query, $sectionId);
+            } else {
+                // Students can only search notes from active academic year
+                $notes = $this->noteModel->searchByAcademicYear($query, $sectionId, $activeYear ? $activeYear['id'] : null);
+            }
             
             // Process and format note content for preview
             foreach ($notes as &$note) {

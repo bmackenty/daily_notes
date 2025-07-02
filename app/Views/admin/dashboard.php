@@ -256,9 +256,14 @@ function human_timing($timestamp) {
                 <div class="tab-pane fade" id="academic">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2>Academic Years</h2>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAcademicYearModal">
-                            Add New Academic Year
-                        </button>
+                        <div>
+                            <a href="/admin/settings/academic-years" class="btn btn-outline-secondary me-2">
+                                <i class="bi bi-gear"></i> Manage Academic Years
+                            </a>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAcademicYearModal">
+                                Add New Academic Year
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="card">
@@ -289,12 +294,22 @@ function human_timing($timestamp) {
                                                     <?= date('M d, Y', strtotime($year['end_date'])) ?>
                                                 </td>
                                                 <td>
-                                                    <button type="button" 
-                                                            class="btn btn-sm btn-primary" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#editAcademicYearModal<?= $year['id'] ?>">
-                                                        <i class="bi bi-pencil"></i> Edit
-                                                    </button>
+                                                    <div class="btn-group">
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-primary" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#editAcademicYearModal<?= $year['id'] ?>">
+                                                            <i class="bi bi-pencil"></i> Edit
+                                                        </button>
+                                                        <?php if (!$year['is_active']): ?>
+                                                            <form method="POST" action="/admin/settings/academic-years/set-active" class="d-inline">
+                                                                <input type="hidden" name="id" value="<?= $year['id'] ?>">
+                                                                <button type="submit" class="btn btn-sm btn-success">
+                                                                    <i class="bi bi-check-circle"></i> Set Active
+                                                                </button>
+                                                            </form>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

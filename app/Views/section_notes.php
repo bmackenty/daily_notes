@@ -94,12 +94,46 @@ function human_timing($timestamp) {
                 </div>
             </div>
 
+            <!-- Academic Year Info -->
+            <?php 
+            $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+            $academicYearModel = new \App\Models\AcademicYear($GLOBALS['pdo']);
+            $activeYear = $academicYearModel->getActive();
+            ?>
+            <div class="alert alert-info mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-calendar-event text-info me-2"></i>
+                    <div>
+                        <strong>Academic Year:</strong> 
+                        <?php if ($activeYear): ?>
+                            <?= htmlspecialchars($activeYear['name']) ?>
+                            (<?= date('M d, Y', strtotime($activeYear['start_date'])) ?> - <?= date('M d, Y', strtotime($activeYear['end_date'])) ?>)
+                        <?php else: ?>
+                            <span class="text-warning">No active academic year set</span>
+                        <?php endif; ?>
+                        
+                        <?php if ($isAdmin): ?>
+                            <br><small class="text-muted">
+                                <i class="bi bi-shield-check"></i> Admin view: Showing ALL notes (including previous academic years)
+                            </small>
+                        <?php else: ?>
+                            <br><small class="text-muted">
+                                <i class="bi bi-person"></i> Student view: Showing only notes from current academic year
+                            </small>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
             <div class="card mb-4">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="h5 mb-0">
                             <i class="bi bi-journal-text text-primary me-2"></i>
                             Daily Notes for <?= htmlspecialchars($section['name']) ?>
+                            <span class="badge bg-secondary ms-2">
+                                <?= count($notes) ?> note<?= count($notes) !== 1 ? 's' : '' ?>
+                            </span>
                         </h3>
                     </div>
                 </div>
@@ -139,12 +173,23 @@ function human_timing($timestamp) {
                             <?php foreach ($notes as $note): ?>
                                 <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes/<?= $note['id'] ?>" 
                                    class="list-group-item list-group-item-action">
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-journal-text text-primary me-2"></i>
-                                        <?= date('l, F j, Y', strtotime($note['date'])) ?>
-                                        <span class="text-muted ms-2">
-                                            (<?= human_timing(strtotime($note['date'])) ?>)
-                                        </span>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-journal-text text-primary me-2"></i>
+                                            <?= date('l, F j, Y', strtotime($note['date'])) ?>
+                                            <span class="text-muted ms-2">
+                                                (<?= human_timing(strtotime($note['date'])) ?>)
+                                            </span>
+                                        </div>
+                                        <?php if ($isAdmin && isset($note['academic_year_id'])): ?>
+                                            <?php 
+                                            $noteYear = $academicYearModel->get($note['academic_year_id']);
+                                            $isCurrentYear = $activeYear && $note['academic_year_id'] == $activeYear['id'];
+                                            ?>
+                                            <span class="badge <?= $isCurrentYear ? 'bg-success' : 'bg-warning' ?>">
+                                                <?= $noteYear ? htmlspecialchars($noteYear['name']) : 'Unknown Year' ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </div>
                                 </a>
                             <?php endforeach; ?>

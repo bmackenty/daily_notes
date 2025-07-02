@@ -38,6 +38,7 @@ class Note {
      * - Inserting the note into the database
      * - Creating/updating associated tags
      * - Managing database transactions
+     * - Automatically assigning the active academic year
      * 
      * @param array $data Note data including:
      *                    - user_id: ID of the user creating the note
@@ -50,10 +51,17 @@ class Note {
     public function create($data) {
         $this->db->beginTransaction();
         try {
+            // Get the active academic year if not provided
+            if (!isset($data['academic_year_id'])) {
+                $academicYearModel = new AcademicYear($this->db);
+                $activeYear = $academicYearModel->getActive();
+                $data['academic_year_id'] = $activeYear ? $activeYear['id'] : null;
+            }
+            
             // Insert the main note record
             $stmt = $this->db->prepare("
-                INSERT INTO notes (user_id, section_id, title, content, date)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO notes (user_id, section_id, title, content, date, academic_year_id)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
@@ -61,7 +69,8 @@ class Note {
                 $data['section_id'],
                 $data['title'],
                 $data['content'],
-                $data['date']
+                $data['date'],
+                $data['academic_year_id']
             ]);
             
             $noteId = $this->db->lastInsertId();
@@ -92,13 +101,31 @@ class Note {
      * Get all notes for a specific section
      * 
      * @param int $sectionId ID of the section
+     * @param int|null $academicYearId Optional academic year ID to filter by
      * @return array Array of notes, ordered by date (newest first)
      */
-    public function getAllBySection($sectionId) {
-        $sql = "SELECT * FROM notes WHERE section_id = ? ORDER BY date DESC";
+    public function getAllBySection($sectionId, $academicYearId = null) {
+        $sql = "SELECT * FROM notes WHERE section_id = ?";
+        $params = [$sectionId];
+        
+        if ($academicYearId !== null) {
+            $sql .= " AND academic_year_id = ?";
+            $params[] = $academicYearId;
+        }
+        
+        $sql .= " ORDER BY date DESC";
+        
+        // Debug the SQL query
+        error_log("Note::getAllBySection SQL: " . $sql);
+        error_log("Note::getAllBySection params: " . print_r($params, true));
+        
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$sectionId]);
-        return $stmt->fetchAll();
+        $stmt->execute($params);
+        $results = $stmt->fetchAll();
+        
+        error_log("Note::getAllBySection results count: " . count($results));
+        
+        return $results;
     }
     
     /**
@@ -172,12 +199,21 @@ class Note {
      * Get the most recent note for a section
      * 
      * @param int $sectionId ID of the section
+     * @param int|null $academicYearId Optional academic year ID to filter by
      * @return array|false Most recent note if found, false otherwise
      */
-    public function getLastBySection($sectionId) {
-        $sql = "SELECT * FROM notes WHERE section_id = :section_id ORDER BY date DESC LIMIT 1";
+    public function getLastBySection($sectionId, $academicYearId = null) {
+        $sql = "SELECT * FROM notes WHERE section_id = :section_id";
+        $params = ['section_id' => $sectionId];
+        
+        if ($academicYearId !== null) {
+            $sql .= " AND academic_year_id = :academic_year_id";
+            $params['academic_year_id'] = $academicYearId;
+        }
+        
+        $sql .= " ORDER BY date DESC LIMIT 1";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['section_id' => $sectionId]);
+        $stmt->execute($params);
         return $stmt->fetch();
     }
 
@@ -204,6 +240,44 @@ class Note {
         if ($sectionId) {
             $sql .= " AND n.section_id = ?";
             $params[] = $sectionId;
+        }
+        
+        $sql .= " ORDER BY n.date DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Search notes by content or title within a specific academic year
+     * 
+     * This method performs a search across note titles and content,
+     * filtering by academic year and optionally by section. Results include related
+     * section and course information.
+     * 
+     * @param string $query Search query
+     * @param int|null $sectionId Optional section ID to filter results
+     * @param int|null $academicYearId Academic year ID to filter results
+     * @return array Array of matching notes with section and course information
+     */
+    public function searchByAcademicYear($query, $sectionId = null, $academicYearId = null) {
+        $sql = "SELECT n.*, s.name as section_name, c.name as course_name 
+                FROM notes n 
+                JOIN sections s ON n.section_id = s.id 
+                JOIN courses c ON s.course_id = c.id 
+                WHERE (n.title LIKE ? OR n.content LIKE ?)";
+        
+        $params = ["%$query%", "%$query%"];
+        
+        if ($sectionId) {
+            $sql .= " AND n.section_id = ?";
+            $params[] = $sectionId;
+        }
+        
+        if ($academicYearId !== null) {
+            $sql .= " AND n.academic_year_id = ?";
+            $params[] = $academicYearId;
         }
         
         $sql .= " ORDER BY n.date DESC";

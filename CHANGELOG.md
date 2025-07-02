@@ -72,6 +72,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Database structure
 - Core MVC framework 
 
+## [0.7.0] - 2025-07-02
+### Added
+- Academic year filtering for daily notes
+- Students and unauthenticated users now only see notes from the current active academic year
+- Admin users can see all notes across all academic years
+- Visual indicators showing which academic year each note belongs to (admin view)
+- Academic year information display on notes pages
+- Automatic assignment of new notes to the currently active academic year
+
+### Changed
+- Updated note creation to automatically assign academic year
+- Enhanced admin dashboard with "Set Active" buttons for academic years
+- Modified note retrieval methods to support academic year filtering
+- Updated search functionality to filter by academic year for students
+- Updated tag system to filter by academic year for students
+
+### Technical
+- Added `academic_year_id` column to `notes` table with foreign key relationship
+- Created migration script for academic year assignment
+- Updated `Note` model with academic year filtering methods
+- Updated `CourseController` and `HomeController` with role-based filtering logic
+- Updated `Tag` model to support academic year filtering
+- Added database index for `academic_year_id` for better performance
+
 ## [0.6.1] - 2025-01-12
 ### Added
 - Pre-fill new daily note content with the previous note's content if available.

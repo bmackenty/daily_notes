@@ -56,9 +56,12 @@ CREATE TABLE notes (
     title VARCHAR(255) NOT NULL,
     content TEXT,
     date DATE NOT NULL,
+    academic_year_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
+    FOREIGN KEY (academic_year_id) REFERENCES academic_years(id) ON DELETE SET NULL,
+    INDEX idx_notes_academic_year (academic_year_id)
 );
 
 CREATE TABLE settings (
