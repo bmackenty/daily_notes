@@ -66,7 +66,7 @@
                         
                         <div class="mb-3">
                             <label>Content</label>
-                            <textarea id="content" name="content" class="form-control" required><?= isset($lastNote) ? $lastNote['content'] : '' ?></textarea>
+                            <textarea id="content" name="content" class="form-control" required><?= (isset($lastNote) && is_array($lastNote)) ? $lastNote['content'] : '' ?></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Save Note</button>
