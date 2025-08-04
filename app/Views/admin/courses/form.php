@@ -1,4 +1,23 @@
-<form method="POST" action="<?= isset($course) ? "/admin/courses/edit/{$course['id']}" : "/admin/courses/create" ?>">
+<!-- Add TinyMCE -->
+<script src="https://cdn.tiny.cloud/1/0ej5pnow0o4gxdyaqdyz2zgdu0f4nulp55y17gr52byvbd35/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        tinymce.init({
+            selector: '.rich-editor',
+            height: 300,
+            plugins: 'lists link table code help wordcount',
+            toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link | code',
+            menubar: false,
+            setup: function(editor) {
+                editor.on('change', function() {
+                    editor.save();
+                });
+            }
+        });
+    });
+</script>
+
+<form method="POST" action="<?= isset($course) ? "/admin/courses/edit/{$course['id']}" : "/admin/courses/create" ?>" onsubmit="return validateForm()">
     <div class="mb-3">
         <label>Course Name</label>
         <input type="text" name="name" class="form-control" required 
@@ -13,47 +32,49 @@
 
     <div class="mb-3">
         <label>Description</label>
-        <textarea name="description" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['description']) : '' ?></textarea>
+        <textarea name="description" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['description']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
         <label>Aims</label>
-        <textarea name="aims" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['aims']) : '' ?></textarea>
+        <textarea name="aims" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['aims']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
         <label>Assessment</label>
-        <textarea name="assessment" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['assessment']) : '' ?></textarea>
+        <textarea name="assessment" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['assessment']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
         <label>Required Materials</label>
-        <textarea name="required" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['required']) : '' ?></textarea>
+        <textarea name="required" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['required']) : '' ?></textarea>
     </div>
+
+
 
     <div class="mb-3">
         <label>Communication</label>
-        <textarea name="communication" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['communication']) : '' ?></textarea>
+        <textarea name="communication" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['communication']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
         <label>Policies</label>
-        <textarea name="policies" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['policies']) : '' ?></textarea>
+        <textarea name="policies" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['policies']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
         <label>Rules</label>
-        <textarea name="rules" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['rules']) : '' ?></textarea>
+        <textarea name="rules" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['rules']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
         <label>Academic Integrity</label>
-        <textarea name="academic_integrity" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['academic_integrity']) : '' ?></textarea>
+        <textarea name="academic_integrity" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['academic_integrity']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
         <label>Prerequisites</label>
-        <textarea name="prerequisites" class="form-control" rows="3"><?= isset($course) ? htmlspecialchars($course['prerequisites']) : '' ?></textarea>
+        <textarea name="prerequisites" class="form-control rich-editor" rows="3"><?= isset($course) ? htmlspecialchars($course['prerequisites']) : '' ?></textarea>
     </div>
 
     <div class="mb-3">
@@ -82,6 +103,25 @@
         <label>Default Tags (comma-separated)</label>
         <input type="text" name="default_tags" class="form-control" 
                value="<?= isset($course) ? htmlspecialchars($course['default_tags']) : '' ?>">
+    </div>
+
+    <!-- Weekly Plan Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Weekly Plan</h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label>Weekly Plan Overview</label>
+                <textarea name="weekly_plan" class="form-control rich-editor" rows="6" 
+                          placeholder="Enter a general overview of the weekly plan for this course..."><?= isset($course) ? htmlspecialchars($course['weekly_plan'] ?? '') : '' ?></textarea>
+                <small class="form-text text-muted">
+                    Provide a general overview of the weekly structure and planning for this course. 
+                    For detailed weekly plans by specific weeks, use the 
+                    <a href="/admin/courses/<?= isset($course) ? $course['id'] : '' ?>/weekly-plans" target="_blank">Weekly Plans</a> feature.
+                </small>
+            </div>
+        </div>
     </div>
 
     <!-- Course Links Section -->
@@ -130,4 +170,17 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTeacherName(select);
     }
 });
+
+function validateForm() {
+    // Get content from all TinyMCE editors
+    var editors = ['description', 'aims', 'assessment', 'required', 'communication', 'policies', 'rules', 'academic_integrity', 'prerequisites', 'weekly_plan'];
+    for (var i = 0; i < editors.length; i++) {
+        var editor = tinymce.get(editors[i]);
+        if (editor) {
+            var content = editor.getContent();
+            document.getElementsByName(editors[i])[0].value = content;
+        }
+    }
+    return true;
+}
 </script>

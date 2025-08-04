@@ -71,9 +71,7 @@
                             <i class="bi bi-journal-text"></i> All Notes
                         </a>
 
-                        <a href="/courses/<?= $course['id'] ?>/yearly-plans" class="btn btn-outline-info">
-                            <i class="bi bi-calendar-week"></i> Yearly Plan
-                        </a>
+
                         
                         <?php if (!empty($course['library_link'])): ?>
                             <a href="<?= htmlspecialchars($course['library_link']) ?>" class="btn btn-outline-danger" target="_blank">

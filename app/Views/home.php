@@ -82,9 +82,7 @@
                                     <a href="/syllabus/<?= $course['id'] ?>" class="btn btn-sm btn-outline-primary me-2">
                                         <i class="bi bi-file-text"></i> Syllabus
                                     </a>
-                                    <a href="/courses/<?= $course['id'] ?>/yearly-plans" class="btn btn-sm btn-outline-info">
-                                        <i class="bi bi-calendar-week"></i> Yearly Plan
-                                    </a>
+
                                 </td>
                             </tr>
                             <?php endforeach; ?>

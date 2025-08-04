@@ -61,16 +61,56 @@ class Course {
      * @param array $data Course data including:
      *                    - name: Course name
      *                    - description: Course description (optional)
-     *                    - code: Course code
+     *                    - short_name: Course short name
+     *                    - aims: Course aims (optional)
+     *                    - assessment: Assessment methods (optional)
+     *                    - required: Required materials (optional)
+     *                    - communication: Communication methods (optional)
+     *                    - policies: Course policies (optional)
+     *                    - rules: Course rules (optional)
+     *                    - academic_integrity: Academic integrity policy (optional)
+     *                    - prerequisites: Prerequisites (optional)
+     *                    - teacher: Teacher name
+     *                    - teacher_profile_id: Teacher profile ID (optional)
+     *                    - weekly_plan: Weekly plan overview (optional)
+     *                    - github_link: GitHub repository link (optional)
+     *                    - lms_link: LMS link (optional)
+     *                    - help_link: Help link (optional)
+     *                    - library_link: Library link (optional)
+     *                    - google_classroom_link: Google Classroom link (optional)
+     *                    - default_tags: Default tags (optional)
      * @return int|false ID of the newly created course, or false on failure
      */
     public function create($data) {
-        $sql = "INSERT INTO courses (name, description, code) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO courses (
+            name, description, short_name, aims, assessment, required,
+            communication, policies, rules, academic_integrity, prerequisites,
+            teacher, teacher_profile_id, weekly_plan, github_link, lms_link, help_link, library_link,
+            google_classroom_link, default_tags
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
             $data['name'],
             $data['description'] ?? null,
-            $data['code']
+            $data['short_name'] ?? null,
+            $data['aims'] ?? null,
+            $data['assessment'] ?? null,
+            $data['required'] ?? null,
+            $data['communication'] ?? null,
+            $data['policies'] ?? null,
+            $data['rules'] ?? null,
+            $data['academic_integrity'] ?? null,
+            $data['prerequisites'] ?? null,
+            $data['teacher'] ?? null,
+            $data['teacher_profile_id'] ?? null,
+            $data['weekly_plan'] ?? null,
+            $data['github_link'] ?? null,
+            $data['lms_link'] ?? null,
+            $data['help_link'] ?? null,
+            $data['library_link'] ?? null,
+            $data['google_classroom_link'] ?? null,
+            $data['default_tags'] ?? null
         ]);
         return $this->db->lastInsertId();
     }
@@ -95,14 +135,57 @@ class Course {
      * @param array $data Updated course data including:
      *                    - name: Course name
      *                    - description: Course description (optional)
+     *                    - short_name: Course short name (optional)
+     *                    - aims: Course aims (optional)
+     *                    - assessment: Assessment methods (optional)
+     *                    - required: Required materials (optional)
+     *                    - communication: Communication methods (optional)
+     *                    - policies: Course policies (optional)
+     *                    - rules: Course rules (optional)
+     *                    - academic_integrity: Academic integrity policy (optional)
+     *                    - prerequisites: Prerequisites (optional)
+     *                    - teacher: Teacher name (optional)
+     *                    - teacher_profile_id: Teacher profile ID (optional)
+     *                    - weekly_plan: Weekly plan overview (optional)
+     *                    - github_link: GitHub repository link (optional)
+     *                    - lms_link: LMS link (optional)
+     *                    - help_link: Help link (optional)
+     *                    - library_link: Library link (optional)
+     *                    - google_classroom_link: Google Classroom link (optional)
+     *                    - default_tags: Default tags (optional)
      * @return bool True if update was successful, false otherwise
      */
     public function update($id, $data) {
-        $sql = "UPDATE courses SET name = ?, description = ? WHERE id = ?";
+        $sql = "UPDATE courses SET 
+            name = ?, description = ?, short_name = ?, aims = ?, assessment = ?, 
+            required = ?, communication = ?, policies = ?, rules = ?,
+            academic_integrity = ?, prerequisites = ?, teacher = ?, teacher_profile_id = ?,
+            weekly_plan = ?, github_link = ?, lms_link = ?, help_link = ?, library_link = ?,
+            google_classroom_link = ?, default_tags = ?
+            WHERE id = ?";
+        
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             $data['name'],
             $data['description'] ?? null,
+            $data['short_name'] ?? null,
+            $data['aims'] ?? null,
+            $data['assessment'] ?? null,
+            $data['required'] ?? null,
+            $data['communication'] ?? null,
+            $data['policies'] ?? null,
+            $data['rules'] ?? null,
+            $data['academic_integrity'] ?? null,
+            $data['prerequisites'] ?? null,
+            $data['teacher'] ?? null,
+            $data['teacher_profile_id'] ?? null,
+            $data['weekly_plan'] ?? null,
+            $data['github_link'] ?? null,
+            $data['lms_link'] ?? null,
+            $data['help_link'] ?? null,
+            $data['library_link'] ?? null,
+            $data['google_classroom_link'] ?? null,
+            $data['default_tags'] ?? null,
             $id
         ]);
     }

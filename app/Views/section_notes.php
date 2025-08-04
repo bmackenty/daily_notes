@@ -63,9 +63,7 @@ function human_timing($timestamp) {
                             <i class="bi bi-file-text"></i> Syllabus
                         </a>
                         
-                        <a href="/courses/<?= $course['id'] ?>/yearly-plans" class="btn btn-outline-info">
-                            <i class="bi bi-calendar-week"></i> Yearly Plan
-                        </a>
+
                         
                         <?php if (!empty($course['library_link'])): ?>
                             <a href="<?= htmlspecialchars($course['library_link']) ?>" class="btn btn-outline-danger" target="_blank">

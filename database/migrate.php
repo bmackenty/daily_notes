@@ -30,35 +30,52 @@ try {
     
     $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass'], $options);
     
-    // Read and execute the migration file
-    $migrationFile = __DIR__ . '/migrations/001_add_security_tables.sql';
-    if (!file_exists($migrationFile)) {
-        throw new RuntimeException("Migration file not found: $migrationFile");
+    // Get all migration files
+    $migrationsDir = __DIR__ . '/migrations/';
+    $migrationFiles = glob($migrationsDir . '*.sql');
+    sort($migrationFiles); // Ensure files are processed in order
+    
+    if (empty($migrationFiles)) {
+        throw new RuntimeException("No migration files found in: $migrationsDir");
     }
     
-    $migration = file_get_contents($migrationFile);
-    if ($migration === false) {
-        throw new RuntimeException("Failed to read migration file");
-    }
+    echo "Found " . count($migrationFiles) . " migration files.\n";
     
-    // Split the file into individual statements
-    $statements = array_filter(array_map('trim', explode(';', $migration)));
-    
-    foreach ($statements as $statement) {
-        if (!empty($statement)) {
-            try {
-                $pdo->exec($statement);
-                Logger::log("Executed SQL: " . substr($statement, 0, 100) . "...", 'INFO');
-            } catch (PDOException $e) {
-                // Log the error but continue with other statements
-                Logger::log("Error executing SQL: " . $e->getMessage(), 'ERROR');
-                Logger::log("Failed SQL: " . $statement, 'ERROR');
+    // Process each migration file
+    foreach ($migrationFiles as $migrationFile) {
+        $filename = basename($migrationFile);
+        echo "Processing migration: $filename\n";
+        
+        if (!file_exists($migrationFile)) {
+            throw new RuntimeException("Migration file not found: $migrationFile");
+        }
+        
+        $migration = file_get_contents($migrationFile);
+        if ($migration === false) {
+            throw new RuntimeException("Failed to read migration file: $migrationFile");
+        }
+        
+        // Split the file into individual statements
+        $statements = array_filter(array_map('trim', explode(';', $migration)));
+        
+        foreach ($statements as $statement) {
+            if (!empty($statement)) {
+                try {
+                    $pdo->exec($statement);
+                    Logger::log("Executed SQL from $filename: " . substr($statement, 0, 100) . "...", 'INFO');
+                } catch (PDOException $e) {
+                    // Log the error but continue with other statements
+                    Logger::log("Error executing SQL from $filename: " . $e->getMessage(), 'ERROR');
+                    Logger::log("Failed SQL: " . $statement, 'ERROR');
+                }
             }
         }
+        
+        echo "Completed migration: $filename\n";
     }
     
-    echo "Migration completed successfully!\n";
-    Logger::log("Migration completed successfully", 'SUCCESS');
+    echo "All migrations completed successfully!\n";
+    Logger::log("All migrations completed successfully", 'SUCCESS');
 } catch (Exception $e) {
     echo "Migration failed: " . $e->getMessage() . "\n";
     Logger::log("Migration failed: " . $e->getMessage(), 'ERROR');

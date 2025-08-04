@@ -35,7 +35,7 @@
                                     <i class="bi bi-info-circle-fill text-info me-2" style="font-size: 1.2rem;"></i>
                                     <h3 class="h5 mb-0">Course Description</h3>
                                 </div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($course['description'])) ?></p>
+                                <div class="mb-0"><?= $course['description'] ?></div>
                             </div>
 
                             <!-- Course Aims -->
@@ -44,7 +44,7 @@
                                     <i class="bi bi-bullseye text-success me-2" style="font-size: 1.2rem;"></i>
                                     <h3 class="h5 mb-0">Course Aims</h3>
                                 </div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($course['aims'])) ?></p>
+                                <div class="mb-0"><?= $course['aims'] ?></div>
                             </div>
 
                             <!-- Assessment Methods -->
@@ -53,7 +53,7 @@
                                     <i class="bi bi-clipboard-check text-warning me-2" style="font-size: 1.2rem;"></i>
                                     <h3 class="h5 mb-0">Assessment Methods</h3>
                                 </div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($course['assessment'])) ?></p>
+                                <div class="mb-0"><?= $course['assessment'] ?></div>
                             </div>
 
                             <!-- Required Materials -->
@@ -62,8 +62,10 @@
                                     <i class="bi bi-journal-bookmark text-primary me-2" style="font-size: 1.2rem;"></i>
                                     <h3 class="h5 mb-0">Required Materials</h3>
                                 </div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($course['required'])) ?></p>
+                                <div class="mb-0"><?= $course['required'] ?></div>
                             </div>
+
+
 
                             <!-- Communication -->
                             <div class="mb-4 border border-secondary rounded p-3">
@@ -71,7 +73,7 @@
                                     <i class="bi bi-chat-dots text-secondary me-2" style="font-size: 1.2rem;"></i>
                                     <h3 class="h5 mb-0">Communication</h3>
                                 </div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($course['communication'])) ?></p>
+                                <div class="mb-0"><?= $course['communication'] ?></div>
                             </div>
 
                             <!-- Policies -->
@@ -80,7 +82,7 @@
                                     <i class="bi bi-shield-check text-danger me-2" style="font-size: 1.2rem;"></i>
                                     <h3 class="h5 mb-0">Policies</h3>
                                 </div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($course['policies'])) ?></p>
+                                <div class="mb-0"><?= $course['policies'] ?></div>
                             </div>
 
                             <!-- Rules -->
@@ -89,8 +91,30 @@
                                     <i class="bi bi-list-check text-dark me-2" style="font-size: 1.2rem;"></i>
                                     <h3 class="h5 mb-0">Rules</h3>
                                 </div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($course['rules'])) ?></p>
+                                <div class="mb-0"><?= $course['rules'] ?></div>
                             </div>
+
+                            <!-- Academic Integrity -->
+                            <?php if (!empty($course['academic_integrity'])): ?>
+                            <div class="mb-4 border border-danger rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-shield-exclamation text-danger me-2" style="font-size: 1.2rem;"></i>
+                                    <h3 class="h5 mb-0">Academic Integrity</h3>
+                                </div>
+                                <div class="mb-0"><?= $course['academic_integrity'] ?></div>
+                            </div>
+                            <?php endif; ?>
+
+                            <!-- Weekly Plan -->
+                            <?php if (!empty($course['weekly_plan'])): ?>
+                            <div class="mb-4 border border-info rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-calendar-week text-info me-2" style="font-size: 1.2rem;"></i>
+                                    <h3 class="h5 mb-0">Weekly Plan</h3>
+                                </div>
+                                <div class="mb-0"><?= $course['weekly_plan'] ?></div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
