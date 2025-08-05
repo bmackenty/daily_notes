@@ -114,7 +114,7 @@
                                 </a>
                             </h5>
                         </div>
-                        <p class="card-text flex-grow-1"><?= htmlspecialchars($course['description']) ?></p>
+                        <div class="card-text flex-grow-1"><?= $course['description'] ?></div>
                         <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-person-circle text-secondary me-2"></i>

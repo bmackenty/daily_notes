@@ -75,6 +75,11 @@ switch ($request) {
             header('Location: /admin/dashboard');
         }
         break;
+        
+    case '/admin/backup-database':
+        $controller = new AdminController($pdo);
+        $controller->backupDatabase();
+        break;
 
     case '/admin/courses':
         $controller = new AdminController($pdo);

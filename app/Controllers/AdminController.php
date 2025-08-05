@@ -850,4 +850,92 @@ class AdminController {
         header('Location: /courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes');
         exit;
     }
+
+    /**
+     * Creates a database backup and triggers download
+     * Generates a date-stamped SQL file with all database data
+     */
+    public function backupDatabase() {
+        try {
+            // Get database configuration
+            $host = $this->db->getAttribute(\PDO::ATTR_CONNECTION_STATUS) ? 'localhost' : 'unknown';
+            $dbname = $this->db->query('SELECT DATABASE()')->fetchColumn();
+            
+            // Create backup filename with timestamp
+            $timestamp = date('Y-m-d_H-i-s');
+            $filename = "daily_notes_backup_{$timestamp}.sql";
+            
+            // Get all tables
+            $tables = [];
+            $result = $this->db->query("SHOW TABLES");
+            while ($row = $result->fetch(\PDO::FETCH_NUM)) {
+                $tables[] = $row[0];
+            }
+            
+            $backup = '';
+            
+            // Add header comment
+            $backup .= "-- Daily Notes Database Backup\n";
+            $backup .= "-- Generated on: " . date('Y-m-d H:i:s') . "\n";
+            $backup .= "-- Database: " . $dbname . "\n\n";
+            
+            // Add SET statements
+            $backup .= "SET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";\n";
+            $backup .= "SET AUTOCOMMIT = 0;\n";
+            $backup .= "START TRANSACTION;\n";
+            $backup .= "SET time_zone = \"+00:00\";\n\n";
+            
+            // Process each table
+            foreach ($tables as $table) {
+                // Get table structure
+                $result = $this->db->query("SHOW CREATE TABLE `$table`");
+                $row = $result->fetch(\PDO::FETCH_NUM);
+                $backup .= "\n-- Table structure for table `$table`\n";
+                $backup .= "DROP TABLE IF EXISTS `$table`;\n";
+                $backup .= $row[1] . ";\n\n";
+                
+                // Get table data
+                $result = $this->db->query("SELECT * FROM `$table`");
+                $rows = $result->fetchAll(\PDO::FETCH_ASSOC);
+                
+                if (!empty($rows)) {
+                    $backup .= "-- Dumping data for table `$table`\n";
+                    
+                    foreach ($rows as $row) {
+                        $backup .= "INSERT INTO `$table` VALUES (";
+                        $values = [];
+                        foreach ($row as $value) {
+                            if ($value === null) {
+                                $values[] = 'NULL';
+                            } else {
+                                $values[] = "'" . addslashes($value) . "'";
+                            }
+                        }
+                        $backup .= implode(', ', $values) . ");\n";
+                    }
+                    $backup .= "\n";
+                }
+            }
+            
+            // Add footer
+            $backup .= "COMMIT;\n";
+            
+            // Set headers for file download
+            header('Content-Type: application/sql');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . strlen($backup));
+            header('Cache-Control: no-cache, must-revalidate');
+            header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
+            
+            // Output the backup content
+            echo $backup;
+            exit;
+            
+        } catch (\Exception $e) {
+            Logger::log("Database backup failed: " . $e->getMessage(), 'ERROR');
+            $_SESSION['error'] = 'Failed to create database backup: ' . $e->getMessage();
+            header('Location: /admin/dashboard#settings');
+            exit;
+        }
+    }
 } 

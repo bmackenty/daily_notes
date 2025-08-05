@@ -1,19 +1,36 @@
 <?php
 function human_timing($timestamp) {
     $time = time() - $timestamp;
+    
+    // Handle future dates
+    if ($time < 0) {
+        $time = abs($time);
+        $tokens = array (
+            31536000 => 'year',
+            2592000 => 'month',
+            604800 => 'week',
+            86400 => 'day'
+        );
+        foreach ($tokens as $unit => $text) {
+            if ($time < $unit) continue;
+            $numberOfUnits = floor($time / $unit);
+            return 'in ' . $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '');
+        }
+        return 'today';
+    }
+    
+    // Handle past dates
     $tokens = array (
         31536000 => 'year',
         2592000 => 'month',
         604800 => 'week',
         86400 => 'day'
     );
-
     foreach ($tokens as $unit => $text) {
         if ($time < $unit) continue;
         $numberOfUnits = floor($time / $unit);
         return $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '') . ' ago';
     }
-    
     return 'today';
 }
 ?>

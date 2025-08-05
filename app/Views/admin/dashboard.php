@@ -217,6 +217,7 @@ function human_timing($timestamp) {
                                         <tr>
                                             <th>Course</th>
                                             <th>Section</th>
+                                            <th>Notes (Current Year)</th>
                                             <th>Last Note</th>
                                             <th>Actions</th>
                                         </tr>
@@ -235,6 +236,21 @@ function human_timing($timestamp) {
                                                     <a href="/admin/sections/<?= $section['id'] ?>/edit" class="text-decoration-none">
                                                         <?= htmlspecialchars($section['name']) ?>
                                                     </a>
+                                                </td>
+                                                <td>
+                                                    <?php 
+                                                    $currentYearNotes = 0;
+                                                    if (isset($notes[$section['id']]) && !empty($notes[$section['id']])) {
+                                                        foreach ($notes[$section['id']] as $note) {
+                                                            if (isset($note['academic_year_id']) && $note['academic_year_id'] == ($activeYear['id'] ?? null)) {
+                                                                $currentYearNotes++;
+                                                            }
+                                                        }
+                                                    }
+                                                    ?>
+                                                                                                         <span class="badge bg-info text-white">
+                                                         <?= $currentYearNotes ?> <?= $currentYearNotes == 1 ? 'note' : 'notes' ?>
+                                                     </span>
                                                 </td>
                                                 <td>
                                                     <?php if (isset($notes[$section['id']]) && !empty($notes[$section['id']])): 
@@ -448,6 +464,19 @@ function human_timing($timestamp) {
                                 </div>
                                 <button type="submit" class="btn btn-primary">Save Settings</button>
                             </form>
+                            
+                            <hr class="my-4">
+                            
+                            <div class="mb-3">
+                                <h5 class="card-title">Database Management</h5>
+                                <p class="text-muted">Create a backup of the database with all your data.</p>
+                                <a href="/admin/backup-database" class="btn btn-success">
+                                    <i class="bi bi-download"></i> Download Database Backup
+                                </a>
+                                <small class="form-text text-muted d-block mt-2">
+                                    This will create a date-stamped SQL file containing all your database data.
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -507,9 +536,7 @@ function human_timing($timestamp) {
                                                     <div class="btn-group">
                                                         <a href="/admin/courses/edit/<?= $course['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
                                                         <a href="/admin/courses/<?= $course['id'] ?>/sections" class="btn btn-sm btn-info">Sections</a>
-                                                        <a href="/admin/courses/<?= $course['id'] ?>/weekly-plans" class="btn btn-sm btn-secondary">
-                                                            <i class="bi bi-calendar-week"></i> Weekly Plans
-                                                        </a>
+
                                                     </div>
                                                 </td>
                                             </tr>
