@@ -217,6 +217,7 @@ function human_timing($timestamp) {
                                         <tr>
                                             <th>Course</th>
                                             <th>Section</th>
+                                            <th>Room</th>
                                             <th>Notes (Current Year)</th>
                                             <th>Last Note</th>
                                             <th>Actions</th>
@@ -236,6 +237,9 @@ function human_timing($timestamp) {
                                                     <a href="/admin/sections/<?= $section['id'] ?>/edit" class="text-decoration-none">
                                                         <?= htmlspecialchars($section['name']) ?>
                                                     </a>
+                                                </td>
+                                                <td>
+                                                    <?= htmlspecialchars($section['meeting_place'] ?? '') ?>
                                                 </td>
                                                 <td>
                                                     <?php 
@@ -269,9 +273,9 @@ function human_timing($timestamp) {
                                                         <span class="badge bg-light text-muted border">No notes</span>
                                                     <?php endif; ?>
                                                 </td>
-                                                <td class="text-end">
+                                                <td class="text-center">
                                                     <a href="/admin/sections/<?= $section['id'] ?>/notes/create" class="btn btn-sm btn-outline-success">New Note</a>
-                                                    <a href="/admin/sections/<?= $section['id'] ?>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                    
                                                     <?php if ($settings['show_delete_buttons'] === 'true'): ?>
                                                         <a href="/admin/sections/<?= $section['id'] ?>/delete" class="btn btn-sm btn-outline-danger"
                                                            onclick="return confirm('Delete this section?')">×</a>
@@ -534,7 +538,6 @@ function human_timing($timestamp) {
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <a href="/admin/courses/edit/<?= $course['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
                                                         <a href="/admin/courses/<?= $course['id'] ?>/sections" class="btn btn-sm btn-info">Sections</a>
 
                                                     </div>
