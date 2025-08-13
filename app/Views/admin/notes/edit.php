@@ -33,7 +33,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h2>Edit Daily Notee</h2>
+                    <h2>Edit Daily Note</h2>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="/admin/notes/<?= $note['id'] ?>/edit" onsubmit="return validateForm()">

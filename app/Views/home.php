@@ -15,9 +15,11 @@
                             <i class="bi bi-journal-text text-primary me-3" style="font-size: 2rem;"></i>
                             <div>
                                 <h5 class="card-title">Daily Learning Notes</h5>
-                                <p class="card-text">This system is designed for teachers to post daily 
-                                    lessons for their students, helping students with review, retention and learning. Daily notes have 
-                                    connections to standards, concepts, differentiated instruction, and more.
+                                <p class="card-text">Daily Learning Notes give you a quick, clear summary of what we 
+                                    covered in class each day. They’re here to help you review important ideas, 
+                                    remember what you learned, and stay on track — even if you missed a lesson. 
+                                    Each note connects to our learning goals, key concepts, and extra resources so you can 
+                                    study in a way that works best for you.
                                 </p>
                             </div>
                         </div>
