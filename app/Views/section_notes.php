@@ -109,36 +109,7 @@ function human_timing($timestamp) {
                 </div>
             </div>
 
-            <!-- Academic Year Info -->
-            <?php 
-            $isAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
-            $academicYearModel = new \App\Models\AcademicYear($GLOBALS['pdo']);
-            $activeYear = $academicYearModel->getActive();
-            ?>
-            <div class="alert alert-info mb-4">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-calendar-event text-info me-2"></i>
-                    <div>
-                        <strong>Academic Year:</strong> 
-                        <?php if ($activeYear): ?>
-                            <?= htmlspecialchars($activeYear['name']) ?>
-                            (<?= date('M d, Y', strtotime($activeYear['start_date'])) ?> - <?= date('M d, Y', strtotime($activeYear['end_date'])) ?>)
-                        <?php else: ?>
-                            <span class="text-warning">No active academic year set</span>
-                        <?php endif; ?>
-                        
-                        <?php if ($isAdmin): ?>
-                            <br><small class="text-muted">
-                                <i class="bi bi-shield-check"></i> Admin view: Showing ALL notes (including previous academic years)
-                            </small>
-                        <?php else: ?>
-                            <br><small class="text-muted">
-                                <i class="bi bi-person"></i> Student view: Showing only notes from current academic year
-                            </small>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+  
 
             <div class="card mb-4">
                 <div class="card-header bg-light">

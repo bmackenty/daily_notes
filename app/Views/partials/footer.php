@@ -4,18 +4,20 @@
     <footer class="bg-dark text-light py-4 mt-auto">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6 text-center">
                     <h5>About</h5>
-                    <p>Daily Notes is a system designed to help students manage and organize their daily meeting notes efficiently.</p>
+                    <p>
+                    Daily Learning Notes give you a quick, clear summary of what we covered in class each day. 
+                    They’re here to help you review important ideas, remember what you learned, and stay on 
+                    track — even if you missed a lesson. Each note connects to our learning goals, key concepts, 
+                    and extra resources so you can study in a way that works best for you.
+                    </p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6 text-center">
                     <h5>Contact</h5>
                     <p>Email: bmackenty@gmail.com</p>
                 </div>
-                <div class="col-md-4">
-                    <h5>Interested in using this in your classroom?</h5>
-                    <p>Choose from our flexible plans to suit your needs. <a href="/pricing" class="text-light">View plans</a>.</p>
-                </div>
+                
             </div>
             <hr class="mt-4 mb-3">
             <div class="text-center">
