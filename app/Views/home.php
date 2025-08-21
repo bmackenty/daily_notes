@@ -31,7 +31,7 @@
     </section>
 <!-- Sections Section -->
 <section class="mb-5">
-        <h2 class="mb-4">Course Sections</h2>
+        <h2 class="mb-4">Courses and Sections</h2>
         <?php foreach ($courses as $course): ?>
         <div class="card mb-4">
             <div class="card-header bg-light">
