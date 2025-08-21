@@ -1,3 +1,49 @@
+<?php 
+// Function to check if note is from the past
+function isPastNote($noteDate) {
+    $noteTimestamp = strtotime($noteDate);
+    $today = strtotime('today');
+    return $noteTimestamp < $today;
+}
+
+// Function to get human-readable time difference
+function human_timing($timestamp) {
+    $time = time() - $timestamp;
+    
+    if ($time < 0) {
+        $time = abs($time);
+        $tokens = array (
+            31536000 => 'year',
+            2592000 => 'month',
+            604800 => 'week',
+            86400 => 'day'
+        );
+        foreach ($tokens as $unit => $text) {
+            if ($time < $unit) continue;
+            $numberOfUnits = floor($time / $unit);
+            return 'in ' . $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '');
+        }
+        return 'today';
+    }
+    
+    $tokens = array (
+        31536000 => 'year',
+        2592000 => 'month',
+        604800 => 'week',
+        86400 => 'day'
+    );
+    foreach ($tokens as $unit => $text) {
+        if ($time < $unit) continue;
+        $numberOfUnits = floor($time / $unit);
+        return $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '') . ' ago';
+    }
+    return 'today';
+}
+
+$isPastNote = isPastNote($note['date']);
+$timeAgo = human_timing(strtotime($note['date']));
+?>
+
 <?php require ROOT_PATH . '/app/Views/partials/header.php'; ?>
 
 <div class="container mt-5">
@@ -82,13 +128,31 @@
                 </div>
             </div>
 
+            <!-- Past Note Indicator -->
+            <?php if ($isPastNote): ?>
+                <div class="alert alert-info mb-4 past-note-indicator">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clock-history text-info me-3 fs-4"></i>
+                        <div>
+                            <h5 class="mb-1">Past Lesson Note</h5>
+                            <p class="mb-0 text-muted">
+                                This note is from <?= $timeAgo ?>. You're viewing content from a previous lesson.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- Daily Note Content -->
-            <div class="card mb-5">
+            <div class="card mb-5 <?= $isPastNote ? 'past-note-card' : '' ?>">
                 <div class="card-header bg-light">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="h5 mb-0">
                             <i class="bi bi-journal-text text-primary me-2"></i>
                             Daily Note for <?= date('F j, Y', strtotime($note['date'])) ?>
+                            <?php if ($isPastNote): ?>
+                                <span class="badge bg-secondary ms-2">Past Lesson</span>
+                            <?php endif; ?>
                         </h3>
                     </div>
          
@@ -102,5 +166,30 @@
         </div>
     </div>
 </div>
+
+<style>
+.past-note-indicator {
+    border-left: 4px solid #17a2b8;
+    background-color: #f8f9fa;
+}
+
+.past-note-indicator .bi-clock-history {
+    font-size: 1.5rem;
+}
+
+.past-note-card {
+    border-left: 4px solid #6c757d;
+    opacity: 0.95;
+}
+
+.past-note-card .card-header {
+    background-color: #f8f9fa !important;
+}
+
+.past-note-card .badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+}
+</style>
 
 <?php require ROOT_PATH . '/app/Views/partials/footer.php'; ?> 

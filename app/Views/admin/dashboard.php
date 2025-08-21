@@ -19,7 +19,7 @@ function human_timing($timestamp) {
             $numberOfUnits = floor($time / $unit);
             return 'in ' . $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '');
         }
-        return 'today';
+        return 'in 1 day';
     }
     
     // Handle past dates
@@ -259,11 +259,16 @@ function human_timing($timestamp) {
                                                 <td>
                                                     <?php if (isset($notes[$section['id']]) && !empty($notes[$section['id']])): 
                                                         $latestNote = reset($notes[$section['id']]);
-                                                        if (isset($latestNote['date']) && $latestNote['date']): ?>
+                                                        if (isset($latestNote['date']) && $latestNote['date']): 
+                                                            $noteDate = strtotime($latestNote['date']);
+                                                            $isFutureNote = $noteDate > time();
+                                                            $isPastNote = $noteDate < strtotime('today');
+                                                            $badgeClass = $isFutureNote ? 'bg-warning text-dark' : ($isPastNote ? 'bg-danger bg-opacity-25 text-dark' : 'bg-light text-dark');
+                                                        ?>
                                                             <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes" class="text-decoration-none d-inline-block">
-                                                                <span class="badge bg-light text-dark border">
+                                                                <span class="badge <?= $badgeClass ?> border">
                                                                     <?= date('M j', strtotime($latestNote['date'])) ?>
-                                                                    <small class="text-muted">(<?= human_timing(strtotime($latestNote['date'])) ?>)</small>
+                                                                    <small class="text-muted">(<?= human_timing($noteDate) ?>)</small>
                                                                 </span>
                                                             </a>
                                                         <?php else: ?>

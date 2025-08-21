@@ -156,13 +156,23 @@ function human_timing($timestamp) {
                         </div>
                     <?php else: ?>
                         <div class="list-group">
-                            <?php foreach ($notes as $note): ?>
+                            <?php foreach ($notes as $index => $note): ?>
+                                <?php 
+                                $isCurrentNote = $index === 0;
+                                $noteClass = $isCurrentNote ? 'list-group-item-action' : 'list-group-item-action past-note';
+                                ?>
                                 <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes/<?= $note['id'] ?>" 
-                                   class="list-group-item list-group-item-action">
+                                   class="list-group-item <?= $noteClass ?>">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center">
-                                            <i class="bi bi-journal-text text-primary me-2"></i>
-                                            <?= date('l, F j, Y', strtotime($note['date'])) ?>
+                                            <?php if ($isCurrentNote): ?>
+                                                <i class="bi bi-journal-text text-primary me-2"></i>
+                                            <?php else: ?>
+                                                <i class="bi bi-journal-text text-muted me-2"></i>
+                                            <?php endif; ?>
+                                            <span class="<?= $isCurrentNote ? '' : 'text-muted' ?>">
+                                                <?= date('l, F j, Y', strtotime($note['date'])) ?>
+                                            </span>
                                             <span class="text-muted ms-2">
                                                 (<?= human_timing(strtotime($note['date'])) ?>)
                                             </span>
@@ -186,6 +196,29 @@ function human_timing($timestamp) {
         </div>
     </div>
 </div>
+
+<style>
+.past-note {
+    opacity: 0.7;
+    background-color: #f8f9fa;
+    border-left: 3px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.past-note:hover {
+    opacity: 0.9;
+    background-color: #e9ecef;
+    border-left-color: #adb5bd;
+}
+
+.past-note .text-muted {
+    color: #6c757d !important;
+}
+
+.past-note i.bi-journal-text {
+    opacity: 0.6;
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
