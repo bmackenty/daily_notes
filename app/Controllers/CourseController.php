@@ -44,6 +44,11 @@ class CourseController {
      * @param \PDO $db Database connection instance
      */
     public function __construct($db) {
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
         $this->db = $db;
         $this->courseModel = new Course($db);
         $this->sectionModel = new Section($db);
@@ -119,20 +124,13 @@ class CourseController {
         $academicYearModel = new AcademicYear($this->db);
         $activeYear = $academicYearModel->getActive();
         
-        // Debug information
-        error_log("User role: " . ($_SESSION['user_role'] ?? 'NOT_LOGGED_IN'));
-        error_log("Is admin: " . ($isAdmin ? 'YES' : 'NO'));
-        error_log("Active year ID: " . ($activeYear ? $activeYear['id'] : 'NULL'));
-        
         // Get notes - filter by active academic year for students
         if ($isAdmin) {
             // Admins see all notes
             $notes = $this->noteModel->getAllBySection($sectionId);
-            error_log("Admin view: Showing all notes (" . count($notes) . " total)");
         } else {
             // Students only see notes from active academic year
             $notes = $this->noteModel->getAllBySection($sectionId, $activeYear ? $activeYear['id'] : null);
-            error_log("Student view: Showing filtered notes (" . count($notes) . " from current year)");
         }
         
         usort($notes, function($a, $b) {
