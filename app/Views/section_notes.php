@@ -92,22 +92,44 @@ function human_timing($timestamp) {
             </div>
 
             <!-- Date Search Instructions -->
-            <div class="alert alert-info border-0 bg-light">
-                <div class="d-flex align-items-start">
-                    <i class="bi bi-lightbulb text-warning me-3 mt-1"></i>
-                    <div>
-                        <h6 class="alert-heading mb-2">
-                            <i class="bi bi-calendar-search text-primary me-2"></i>
-                            New: Find Past Daily Notes by Date!
-                        </h6>
-                        <p class="mb-2 small">
-                            Use the search tools below to quickly find notes from specific dates:
-                        </p>
-                        <ul class="mb-0 small">
-                            <li><strong>Calendar Picker:</strong> Select any date to find the corresponding note</li>
-                            <li><strong>Natural Language:</strong> Type phrases like "2 days ago" or "last week"</li>
-                            <li><strong>Quick Presets:</strong> Click buttons for common time periods</li>
-                        </ul>
+            <div class="modal fade" id="dateSearchModal" tabindex="-1" aria-labelledby="dateSearchModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="dateSearchModalLabel">
+                                <i class="bi bi-calendar-search me-2"></i>
+                                New: Find Past Daily Notes by Date!
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <p class="mb-3">
+                                        We've added powerful new tools to help you quickly find notes from specific dates. 
+                                        No more scrolling through long lists to find what you need!
+                                    </p>
+                                    <h6 class="text-primary mb-3">How to Use:</h6>
+                                    <ul class="mb-0">
+                                        <li><strong>Calendar Picker:</strong> Select any date to find the corresponding note</li>
+                                        <li><strong>Natural Language:</strong> Type phrases like "2 days ago" or "last week"</li>
+                                        <li><strong>Quick Presets:</strong> Click buttons for common time periods</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div class="bg-light p-3 rounded">
+                                        <i class="bi bi-lightbulb text-warning" style="font-size: 3rem;"></i>
+                                        <p class="small text-muted mt-2 mb-0">Try it out below!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Got it!</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="scrollToSearch()">
+                                <i class="bi bi-arrow-down me-2"></i>Show me the tools
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -115,9 +137,15 @@ function human_timing($timestamp) {
             <!-- Search -->
             <div class="card mb-4">
                 <div class="card-header bg-light">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-search text-primary me-2"></i>
-                        <h3 class="h5 mb-0">Search Notes</h3>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-search text-primary me-2"></i>
+                            <h3 class="h5 mb-0">Search Notes</h3>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-info" onclick="showDateSearchModal()" title="Show date search instructions">
+                            <i class="bi bi-info-circle me-1"></i>
+                            How to use
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -339,6 +367,34 @@ function human_timing($timestamp) {
 
 .alert-info.bg-light .bi-lightbulb {
     font-size: 1.2rem;
+}
+
+/* Modal styling */
+#dateSearchModal .modal-header {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+#dateSearchModal .modal-title {
+    font-weight: 600;
+}
+
+#dateSearchModal .modal-body {
+    padding: 1.5rem;
+}
+
+#dateSearchModal .modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+
+#dateSearchModal .bi-lightbulb {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
 
 /* Responsive adjustments */
@@ -592,6 +648,24 @@ document.addEventListener('DOMContentLoaded', function() {
             searchByDateBtn.click();
         }
     });
+
+    // Show the modal when the page loads
+    const dateSearchModal = new bootstrap.Modal(document.getElementById('dateSearchModal'));
+    dateSearchModal.show();
+
+    // Scroll to the search section after the modal is closed
+    function scrollToSearch() {
+        const searchCard = document.querySelector('.card.mb-4');
+        if (searchCard) {
+            searchCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    // Function to show the date search modal
+    function showDateSearchModal() {
+        const dateSearchModal = new bootstrap.Modal(document.getElementById('dateSearchModal'));
+        dateSearchModal.show();
+    }
 });
 </script>
 
