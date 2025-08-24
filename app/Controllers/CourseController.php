@@ -117,20 +117,19 @@ class CourseController {
             exit;
         }
 
-        // Determine if user is admin (unauthenticated users are treated as students)
+        // Determine if user is admin (used for UI elements like edit buttons)
         $isAdmin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
         
         // Get active academic year for filtering
         $academicYearModel = new AcademicYear($this->db);
         $activeYear = $academicYearModel->getActive();
         
-        // Get notes - filter by active academic year for students
-        if ($isAdmin) {
-            // Admins see all notes
-            $notes = $this->noteModel->getAllBySection($sectionId);
+        // Always filter notes by active academic year for consistency
+        if ($activeYear) {
+            $notes = $this->noteModel->getAllBySection($sectionId, $activeYear['id']);
         } else {
-            // Students only see notes from active academic year
-            $notes = $this->noteModel->getAllBySection($sectionId, $activeYear ? $activeYear['id'] : null);
+            // If no active academic year, show no notes
+            $notes = [];
         }
         
         usort($notes, function($a, $b) {
