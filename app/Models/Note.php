@@ -286,6 +286,61 @@ class Note {
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
+    
+    /**
+     * Search notes by specific date within a section
+     * 
+     * This method finds notes for a specific date within a section,
+     * optionally filtering by academic year. Useful for date-based searches.
+     * 
+     * @param string $date Date in Y-m-d format
+     * @param int $sectionId Section ID to search within
+     * @param int|null $academicYearId Optional academic year ID to filter results
+     * @return array|false Note data if found, false otherwise
+     */
+    public function getByDate($date, $sectionId, $academicYearId = null) {
+        $sql = "SELECT * FROM notes WHERE section_id = ? AND DATE(date) = ?";
+        $params = [$sectionId, $date];
+        
+        if ($academicYearId !== null) {
+            $sql .= " AND academic_year_id = ?";
+            $params[] = $academicYearId;
+        }
+        
+        $sql .= " ORDER BY date DESC LIMIT 1";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch();
+    }
+    
+    /**
+     * Get notes within a date range for a section
+     * 
+     * This method retrieves notes within a specified date range,
+     * useful for finding notes from "last week" or "last month".
+     * 
+     * @param string $startDate Start date in Y-m-d format
+     * @param string $endDate End date in Y-m-d format
+     * @param int $sectionId Section ID to search within
+     * @param int|null $academicYearId Optional academic year ID to filter results
+     * @return array Array of notes within the date range
+     */
+    public function getByDateRange($startDate, $endDate, $sectionId, $academicYearId = null) {
+        $sql = "SELECT * FROM notes WHERE section_id = ? AND DATE(date) BETWEEN ? AND ?";
+        $params = [$sectionId, $startDate, $endDate];
+        
+        if ($academicYearId !== null) {
+            $sql .= " AND academic_year_id = ?";
+            $params[] = $academicYearId;
+        }
+        
+        $sql .= " ORDER BY date DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
 
     /**
      * Delete a note and its associated tags

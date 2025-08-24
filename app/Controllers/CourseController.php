@@ -434,5 +434,125 @@ class CourseController {
         $sections = $this->sectionModel->getAllByCourse($courseId);
         require ROOT_PATH . '/app/Views/search_results.php';
     }
+    
+    /**
+     * Handles date-based note search via AJAX
+     * Returns JSON response with note data or error message
+     * 
+     * @param int $courseId ID of the course
+     * @param int $sectionId ID of the section
+     */
+    public function dateSearch($courseId, $sectionId) {
+        // Verify course exists
+        $course = $this->courseModel->get($courseId);
+        if (!$course) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Course not found']);
+            return;
+        }
+
+        // Verify section exists
+        $section = $this->sectionModel->get($sectionId);
+        if (!$section) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Section not found']);
+            return;
+        }
+
+        // Get search parameters
+        $date = $_GET['date'] ?? null;
+        $daysAgo = $_GET['days_ago'] ?? null;
+        
+        if (!$date && !$daysAgo) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Date parameter required']);
+            return;
+        }
+
+        // Calculate target date
+        $targetDate = null;
+        if ($daysAgo) {
+            $targetDate = date('Y-m-d', strtotime("-{$daysAgo} days"));
+        } else {
+            $targetDate = $date;
+        }
+
+        // Determine if user is admin
+        $isAdmin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
+        
+        // Get active academic year for filtering
+        $academicYearModel = new AcademicYear($this->db);
+        $activeYear = $academicYearModel->getActive();
+        
+        // Search for note by date
+        $note = null;
+        if ($isAdmin) {
+            // Admins can search all notes
+            $note = $this->noteModel->getByDate($targetDate, $sectionId);
+        } else {
+            // Students can only search notes from active academic year
+            $note = $this->noteModel->getByDate($targetDate, $sectionId, $activeYear ? $activeYear['id'] : null);
+        }
+
+        // Set response headers
+        header('Content-Type: application/json');
+        
+        if ($note) {
+            // Format the note for response
+            $note['formatted_date'] = date('l, F j, Y', strtotime($note['date']));
+            $note['human_timing'] = $this->humanTiming(strtotime($note['date']));
+            $note['url'] = "/courses/{$courseId}/sections/{$sectionId}/notes/{$note['id']}";
+            
+            echo json_encode([
+                'success' => true,
+                'note' => $note,
+                'message' => "Found note for {$note['formatted_date']}"
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => "No note found for {$targetDate}"
+            ]);
+        }
+    }
+    
+    /**
+     * Helper function to calculate human-readable time differences
+     * 
+     * @param int $timestamp Unix timestamp
+     * @return string Human-readable time difference
+     */
+    private function humanTiming($timestamp) {
+        $time = time() - $timestamp;
+        
+        if ($time < 0) {
+            $time = abs($time);
+            $tokens = array(
+                31536000 => 'year',
+                2592000 => 'month',
+                604800 => 'week',
+                86400 => 'day'
+            );
+            foreach ($tokens as $unit => $text) {
+                if ($time < $unit) continue;
+                $numberOfUnits = floor($time / $unit);
+                return 'in ' . $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '');
+            }
+            return 'today';
+        }
+        
+        $tokens = array(
+            31536000 => 'year',
+            2592000 => 'month',
+            604800 => 'week',
+            86400 => 'day'
+        );
+        foreach ($tokens as $unit => $text) {
+            if ($time < $unit) continue;
+            $numberOfUnits = floor($time / $unit);
+            return $numberOfUnits . ' ' . $text . (($numberOfUnits > 1) ? 's' : '') . ' ago';
+        }
+        return 'today';
+    }
 } 
 

@@ -215,6 +215,12 @@ switch ($request) {
         $controller->sectionNotes($matches[1], $matches[2]);
         break;
 
+    // Date Search Route - Must come before individual note route
+    case (preg_match('/^\/courses\/(\d+)\/sections\/(\d+)\/notes\/date-search$/', $request, $matches) ? true : false):
+        $controller = new CourseController($pdo);
+        $controller->dateSearch($matches[1], $matches[2]);
+        break;
+
     case '/courses':
         $controller = new CourseController($pdo);
         $controller->index();
@@ -244,6 +250,7 @@ switch ($request) {
         $controller->notesByTag($matches[1], urldecode($matches[2]));
         break;
 
+    // Individual Note Route - Must come after date-search route
     case (preg_match('/^\/courses\/(\d+)\/sections\/(\d+)\/notes\/(\d+)$/', $request, $matches) ? true : false):
         $controller = new CourseController($pdo);
         $controller->singleNote($matches[1], $matches[2], $matches[3]);
