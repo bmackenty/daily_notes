@@ -13,7 +13,7 @@ $academicYearModel = new AcademicYear($pdo);
 $activeYear = $academicYearModel->getActive();
 ?>
 <!DOCTYPE html>
-<html class="h-100">
+<html class="h-100" data-bs-theme="light">
 <head>
     <title>Daily Notes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -43,14 +43,55 @@ $activeYear = $academicYearModel->getActive();
                         </li>
                     <?php endif; ?>
                 </ul>
-                <?php if ($activeYear && isset($activeYear['name'])): ?>
-                    <span class="navbar-text text-white" data-bs-toggle="tooltip" title="Current Academic Year">
-                        <i class="bi bi-calendar3 me-1"></i>
-                        <?= htmlspecialchars($activeYear['name']) ?>
-                    </span>
-                <?php endif; ?>
+                <div class="d-flex align-items-center">
+                    <!-- Dark Mode Toggle -->
+                    <button class="btn btn-outline-light btn-sm me-3" id="darkModeToggle" type="button" title="Toggle Dark Mode">
+                        <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+                    </button>
+                    <?php if ($activeYear && isset($activeYear['name'])): ?>
+                        <span class="navbar-text text-white" data-bs-toggle="tooltip" title="Current Academic Year">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            <?= htmlspecialchars($activeYear['name']) ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </nav>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Dark mode functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    const html = document.documentElement;
+    
+    // Check for saved theme preference or default to light mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-bs-theme', currentTheme);
+    updateIcon(currentTheme);
+    
+    // Toggle dark mode
+    darkModeToggle.addEventListener('click', function() {
+        const currentTheme = html.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        html.setAttribute('data-bs-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateIcon(newTheme);
+    });
+    
+    function updateIcon(theme) {
+        if (theme === 'dark') {
+            darkModeIcon.className = 'bi bi-sun-fill';
+            darkModeToggle.title = 'Switch to Light Mode';
+        } else {
+            darkModeIcon.className = 'bi bi-moon-fill';
+            darkModeToggle.title = 'Switch to Dark Mode';
+        }
+    }
+});
+</script>
