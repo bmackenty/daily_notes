@@ -63,8 +63,8 @@
                     <thead class="small">
                         <tr>
                             <th class="text-muted fw-semibold">Section</th>
-                            <th class="text-muted fw-semibold">Place</th>
-                            <th class="text-muted fw-semibold">Latest</th>
+                            <th class="text-muted fw-semibold">Room</th>
+                            <th class="text-muted fw-semibold">Latest note</th>
                             <th class="text-muted fw-semibold text-end">Links</th>
                         </tr>
                     </thead>
