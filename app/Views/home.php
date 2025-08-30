@@ -2,7 +2,18 @@
 
 <!-- Add Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+<style>
+  #courses-sections .card { border-radius: .5rem; }
+  #courses-sections .card-header { padding: .5rem .75rem; }
+  #courses-sections .card-body { padding: .5rem .75rem; }
+  #courses-sections table.table td,
+  #courses-sections table.table th { padding: .35rem .5rem; vertical-align: middle; }
+  #courses-sections h3.h5 { margin: 0; }
+  #courses-sections .btn { padding: .125rem .375rem; line-height: 1; }
+  #courses-sections .badge-date { font-weight: 500; }
+  #courses-sections .text-tight { line-height: 1.1; }
+  #courses-sections .nowrap { white-space: nowrap; }
+</style>
 <div class="container mt-5">
     <!-- Feature Grid Section -->
     <section class="mb-5">
@@ -16,7 +27,7 @@
                             <div>
                                 <h5 class="card-title">Daily Learning Notes</h5>
                                 <p class="card-text">Daily Learning Notes give you a quick, clear summary of what we 
-                                    covered in class each day. They’re here to help you review important ideas, 
+                                    covered in class each day. They're here to help you review important ideas, 
                                     remember what you learned, and stay on track — even if you missed a lesson. 
                                     Each note connects to our learning goals, key concepts, and extra resources so you can 
                                     study in a way that works best for you.
@@ -26,80 +37,95 @@
                     </div>
                 </div>
             </div>
-      
         </div>
     </section>
-<!-- Sections Section -->
-<section class="mb-5">
-        <h2 class="mb-4">Courses and Sections</h2>
-        <?php foreach ($courses as $course): ?>
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h3 class="h5 mb-0">
-                        <i class="bi bi-book text-primary me-2"></i>
-                        <?= htmlspecialchars($course['name']) ?>
-                    </h3>
 
-                </div>
-            </div>
-            <div class="card-body">
-                <?php if (!empty($sections[$course['id']])): ?>
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Section Name</th>
-                                <th>Meeting Place</th>
-                                <th>Latest Note</th>
-                                <th>Links</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($sections[$course['id']] as $section): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($section['name']) ?></td>
-                                <td><?= htmlspecialchars($section['meeting_place'] ?? '') ?></td>
-                                <td>
-                                    <?php 
-                                    if (!empty($notes[$section['id']])) {
-                                        $latestNote = reset($notes[$section['id']]); // Get first element (latest note)
-                                        echo '<div class="d-flex align-items-center">';
-                                        echo '<i class="bi bi-journal-text text-success me-2"></i>';
-                                        echo '<a href="/courses/' . $course['id'] . '/sections/' . $section['id'] . '/notes" ';
-                                        echo 'class="text-decoration-none" data-bs-toggle="tooltip" ';
-                                        echo 'title="View all notes for this section">';
-                                        echo htmlspecialchars(date('M j, Y', strtotime($latestNote['date'])));
-                                        echo '</a>';
-                                        echo '</div>';
-                                    } else {
-                                        echo '<span class="text-muted"><i class="bi bi-journal-x me-2"></i>No notes yet</span>';
-                                    }
-                                    ?>
-                                </td>
-                                <td>
-                                    <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes" class="btn btn-sm btn-outline-success me-2">
-                                        <i class="bi bi-journal-text"></i> Daily Notes
-                                    </a>
-                                    <a href="/syllabus/<?= $course['id'] ?>" class="btn btn-sm btn-outline-primary me-2">
-                                        <i class="bi bi-file-text"></i> Syllabus
-                                    </a>
 
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php else: ?>
-                <p class="mb-0">No sections available for this course.</p>
-                <?php endif; ?>
+<!-- Sections Section (Compact) -->
+
+
+<section class="mb-5" id="courses-sections">
+    <h2 class="mb-3">Courses and Sections</h2>
+    <?php foreach ($courses as $course): ?>
+    <div class="card mb-3">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0 text-tight">
+                    <i class="bi bi-book text-primary me-2"></i>
+                    <?= htmlspecialchars($course['name']) ?>
+                </h3>
             </div>
         </div>
-        <?php endforeach; ?>
-    </section>
+        <div class="card-body">
+            <?php if (!empty($sections[$course['id']])): ?>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="small">
+                        <tr>
+                            <th class="text-muted fw-semibold">Section</th>
+                            <th class="text-muted fw-semibold">Place</th>
+                            <th class="text-muted fw-semibold">Latest</th>
+                            <th class="text-muted fw-semibold text-end">Links</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        <?php foreach ($sections[$course['id']] as $section): ?>
+                        <tr>
+                            <td class="nowrap"><?= htmlspecialchars($section['name']) ?></td>
+                            <td class="nowrap"><?= htmlspecialchars($section['meeting_place'] ?? '') ?></td>
+                            <td class="nowrap">
+                                <?php if (!empty($notes[$section['id']])): 
+                                    $latestNote = reset($notes[$section['id']]); ?>
+                                    <i class="bi bi-calendar-event text-success me-1"></i>
+                                    <a
+                                        href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes"
+                                        class="text-decoration-none"
+                                        data-bs-toggle="tooltip"
+                                        title="View all notes for this section"
+                                    >
+                                        <span class="badge bg-light text-secondary border badge-date">
+                                            <?= htmlspecialchars(date('M j, Y', strtotime($latestNote['date']))) ?>
+                                        </span>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted">
+                                        <i class="bi bi-journal-x me-1"></i>No notes
+                                    </span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-end">
+                                <a 
+                                    href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes" 
+                                    class="btn btn-outline-success btn-sm me-1"
+                                    data-bs-toggle="tooltip" 
+                                    title="Daily Notes"
+                                >
+                                    <i class="bi bi-journal-text me-1"></i> Daily Notes
+                                </a>
+                                <a 
+                                    href="/syllabus/<?= $course['id'] ?>" 
+                                    class="btn btn-outline-primary btn-sm"
+                                    data-bs-toggle="tooltip" 
+                                    title="Syllabus"
+                                >
+                                    <i class="bi bi-file-text me-1"></i> Syllabus
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php else: ?>
+            <p class="mb-0 small text-muted">No sections available for this course.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</section>
 
-    
+
+
     <!-- Courses Section -->
     <section class="mb-5">
         <h2 class="mb-4">Available Courses</h2>
@@ -109,14 +135,14 @@
                 <div class="card h-100 shadow-sm d-flex flex-column">
                     <div class="card-body d-flex flex-column">
                         <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-book-half text-primary me-2" style="font-size: 1.5rem;"></i>
+                            <i class="bi bi-book-half text-primary me-2" style="font-size: 2rem;"></i>
                             <h5 class="card-title mb-0">
                                 <a href="/syllabus/<?= $course['id'] ?>" class="text-decoration-none">
                                     <?= htmlspecialchars($course['name']) ?>
                                 </a>
                             </h5>
                         </div>
-                        <div class="card-text flex-grow-1"><?= $course['description'] ?></div>
+                        <div class="card-text flex-grow-1"><?= $course['description'] ?? 'No description available' ?></div>
                         <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-person-circle text-secondary me-2"></i>
@@ -130,7 +156,7 @@
                             </div>
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-collection text-info me-2"></i>
-                                <span class="text-muted"><?= count($sections[$course['id']]) ?> sections</span>
+                                <?= count($sections[$course['id']]) ?> sections
                             </div>
                         </div>
                     </div>
@@ -139,8 +165,6 @@
             <?php endforeach; ?>
         </div>
     </section>
-
-    
 </div>
 
 <?php require ROOT_PATH . '/app/Views/partials/footer.php'; ?>

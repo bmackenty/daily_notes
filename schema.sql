@@ -12,6 +12,8 @@ CREATE TABLE users (
     password_reset_token VARCHAR(255) NULL,
     password_reset_expires TIMESTAMP NULL,
     last_password_change TIMESTAMP NULL,
+    remember_token VARCHAR(255) NULL,
+    remember_token_expires TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -25,6 +27,19 @@ CREATE TABLE login_attempts (
     success BOOLEAN DEFAULT FALSE,
     INDEX idx_ip_email (ip_address, email),
     INDEX idx_time (attempt_time)
+);
+
+-- Remember me tokens for persistent login
+CREATE TABLE remember_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token_hash VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_token_hash (token_hash),
+    INDEX idx_expires (expires_at),
+    INDEX idx_user_id (user_id)
 );
 
 -- Security settings

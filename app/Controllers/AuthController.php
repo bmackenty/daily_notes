@@ -7,6 +7,7 @@ use App\Utils\Logger;
 use App\Utils\Security;
 use App\Utils\SessionManager;
 use App\Utils\SecurityHelper;
+use App\Utils\RememberMe;
 
 /**
  * AuthController
@@ -91,6 +92,7 @@ class AuthController {
             // Sanitize and validate input
             $email = SecurityHelper::sanitizeInput($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
+            $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === 'on';
             $ip = $_SERVER['REMOTE_ADDR'];
 
             // Validate email format
@@ -128,7 +130,14 @@ class AuthController {
                 $this->session->set('user_role', $user['role']);
                 $this->session->set('last_activity', time());
                 
-                Logger::log("User {$user['email']} logged in successfully", 'INFO');
+                // Handle remember me functionality
+                if ($rememberMe) {
+                    $rememberMeUtil = new RememberMe($this->db);
+                    $rememberMeUtil->createToken($user['id']);
+                    $this->session->set('remember_me', true);
+                }
+                
+                Logger::log("User {$user['email']} logged in successfully" . ($rememberMe ? ' with remember me' : ''), 'INFO');
                 
                 // Redirect based on user role
                 if ($user['role'] === 'admin') {
@@ -238,9 +247,16 @@ class AuthController {
     
     /**
      * Handles user logout
-     * Destroys the session and redirects to login page
+     * Destroys the session and removes remember me tokens
+     * Redirects to login page
      */
     public function logout() {
+        // Remove remember me tokens if user was logged in
+        if ($this->session->has('user_id')) {
+            $rememberMeUtil = new RememberMe($this->db);
+            $rememberMeUtil->removeAllTokens($this->session->get('user_id'));
+        }
+        
         $this->session->destroySession();
         header('Location: /login');
         exit;

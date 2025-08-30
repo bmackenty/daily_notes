@@ -226,17 +226,18 @@ function human_timing($timestamp) {
                                     <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes/<?= $note['id'] ?>" 
                                        class="list-group-item <?= $noteClass ?>">
                                         <div class="d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center">
+                                            <div class="d-flex align-items-center flex-grow-1">
                                                 <?php if ($isCurrentNote): ?>
                                                     <i class="bi bi-journal-text text-primary me-2"></i>
                                                 <?php else: ?>
                                                     <i class="bi bi-journal-text text-muted me-2"></i>
                                                 <?php endif; ?>
-                                                <span class="<?= $isCurrentNote ? '' : 'text-muted' ?>">
+                                                <small class="text-muted me-2">
                                                     <?= date('l, F j, Y', strtotime($note['date'])) ?>
-                                                </span>
-                                                <span class="text-muted ms-2">
-                                                    (<?= human_timing(strtotime($note['date'])) ?>)
+                                                    <span class="ms-2">(<?= human_timing(strtotime($note['date'])) ?>)</span>
+                                                </small>
+                                                <span class="<?= $isCurrentNote ? 'fw-bold' : 'text-muted' ?>">
+                                                    <?= htmlspecialchars($note['title']) ?>
                                                 </span>
                                             </div>
                                             <?php if ($isAdmin && isset($note['academic_year_id'])): ?>

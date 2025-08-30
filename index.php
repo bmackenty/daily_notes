@@ -43,6 +43,7 @@ require_once ROOT_PATH . '/app/Utils/DatabaseAdapter.php';  // Database connecti
 require_once ROOT_PATH . '/app/Utils/Security.php';         // Security utilities
 require_once ROOT_PATH . '/app/Utils/SecurityHelper.php';   // Additional security helpers
 require_once ROOT_PATH . '/app/Utils/SessionManager.php';   // Session management
+require_once ROOT_PATH . '/app/Utils/RememberMe.php';      // Remember me functionality
 
 // Load middleware
 require_once ROOT_PATH . '/app/Middleware/SecurityHeaders.php';  // Security headers management

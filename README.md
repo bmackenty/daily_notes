@@ -47,6 +47,7 @@
 - Encrypted password storage and secure session handling
 - Input validation and prepared statements
 - Environment-based configuration and secure file handling
+- **NEW**: Remember Me functionality for persistent login sessions
 
 
 ## Configuration

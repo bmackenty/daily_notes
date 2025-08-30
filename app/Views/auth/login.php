@@ -53,6 +53,12 @@ $csrfToken = SecurityHelper::generateCsrfToken();
                                     After 5 failed attempts, your account will be locked for 15 minutes.
                                 </small>
                             </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                                <label class="form-check-label" for="remember_me">
+                                    Keep me logged in for 30 days
+                                </label>
+                            </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">Login</button>
                             </div>

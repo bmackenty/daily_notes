@@ -71,6 +71,7 @@ class SessionManager {
      * - Secure cookie settings
      * - Session ID regeneration
      * - Session timeout checking
+     * - Remember me token validation
      * 
      * Cookie Settings:
      * - lifetime: 0 (until browser closes)
@@ -109,6 +110,11 @@ class SessionManager {
             session_start();
         }
 
+        // Check for remember me token if no active session
+        if (!isset($_SESSION['user_id']) && !isset($_SESSION['last_activity'])) {
+            $this->checkRememberMeToken();
+        }
+
         // Implement security measures
         $this->regenerateSessionId();
         $this->checkSessionTimeout();
@@ -145,13 +151,39 @@ class SessionManager {
         // Check if session has expired
         if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > $timeout)) {
             // Session expired - destroy and redirect
-            $this->destroySession();
             header('Location: /login?session=expired');
             exit;
         }
         
         // Update last activity timestamp
         $_SESSION['last_activity'] = time();
+    }
+    
+    /**
+     * Checks for remember me token and logs user in if valid
+     * Validates the remember me cookie and creates a session if token is valid
+     * This allows users to stay logged in across browser sessions
+     */
+    private function checkRememberMeToken() {
+        try {
+            $rememberMe = new \App\Utils\RememberMe($this->config->getDatabase());
+            $user = $rememberMe->validateToken();
+            
+            if ($user) {
+                // Token is valid - create session
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['last_activity'] = time();
+                $_SESSION['remember_me'] = true;
+                
+                // Log the automatic login
+                \App\Utils\Logger::log("User {$user['email']} logged in via remember me token", 'INFO');
+            }
+        } catch (\Exception $e) {
+            // Log error but don't break the application
+            error_log("Error checking remember me token: " . $e->getMessage());
+        }
     }
 
     /**

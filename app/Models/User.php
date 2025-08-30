@@ -25,6 +25,46 @@ class User {
         ]);
         return $this->db->lastInsertId();
     }
+    
+    public function findById($id) {
+        $sql = "SELECT * FROM users WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+    
+    public function createRememberToken($userId, $tokenHash, $expiresAt) {
+        $sql = "INSERT INTO remember_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$userId, $tokenHash, $expiresAt]);
+    }
+    
+    public function findUserByRememberToken($tokenHash) {
+        $sql = "SELECT u.* FROM users u 
+                INNER JOIN remember_tokens rt ON u.id = rt.user_id 
+                WHERE rt.token_hash = ? AND rt.expires_at > NOW()";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$tokenHash]);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+    
+    public function deleteRememberToken($tokenHash) {
+        $sql = "DELETE FROM remember_tokens WHERE token_hash = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$tokenHash]);
+    }
+    
+    public function deleteAllRememberTokens($userId) {
+        $sql = "DELETE FROM remember_tokens WHERE user_id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$userId]);
+    }
+    
+    public function cleanupExpiredRememberTokens() {
+        $sql = "DELETE FROM remember_tokens WHERE expires_at < NOW()";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute();
+    }
 
     public function validatePassword($password) {
         // Minimum 8 characters
