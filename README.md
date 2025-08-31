@@ -1,41 +1,53 @@
-# 📚 Daily Notes - Features
+# 📚 Daily Notes - Learning Management System
+
+## 🎯 What is Daily Notes?
+
+Daily Learning Notes give you a quick, clear summary of what we covered in class each day. They're here to help you review important ideas, remember what you learned, and stay on track — even if you missed a lesson. Each note connects to our learning goals, key concepts, and extra resources so you can study in a way that works best for you.
 
 ## 🎯 Core Features
-- 📝 Rich text editor for creating and managing daily lesson notes
-- 📅 Comprehensive course management system
-- 👥 Section-based organization with meeting schedules
-- 📊 Weekly planning tools with learning objectives
-- 📋 Detailed syllabus management
 
+### For Teachers
+- 📝 Create and manage daily learning summaries for each class section
+- 📅 Comprehensive course management system with sections and meeting schedules
+- 📊 Weekly planning tools with learning objectives and outcomes
+- 📋 Detailed syllabus management and resource linking
+- 👥 Section-based organization with student access control
+- 🏷️ Tag-based organization for easy content discovery
+
+### For Students
+- 📖 Access to daily learning summaries from missed or attended classes
+- 🔍 Search functionality across all notes and content
+- 📱 Responsive design for mobile and desktop access
+- 🎯 Clear connection to learning goals and key concepts
+- 📚 Easy navigation through course materials and resources
 
 ## 📊 Course Management
-- Create and manage multiple courses
-- Define course descriptions and objectives
-- Set assessment methods and requirements
-- Establish course policies and rules
-- Track prerequisites and materials
-- Manage academic integrity guidelines
+- Create and manage multiple courses with detailed descriptions
+- Define course objectives, assessment methods, and requirements
+- Establish course policies and academic integrity guidelines
+- Track prerequisites and required materials
+- Manage multiple sections within each course
 
-## 📝 Note Taking Features
-- Rich text formatting with TinyMCE
-- Support for images, tables, and links
-- Code snippet integration
-- File attachments
-- Automatic content saving
+## 📝 Daily Learning Summaries
+- Rich text formatting with TinyMCE editor for comprehensive content
+- Support for images, tables, links, and multimedia content
+- Code snippet integration for technical courses
+- Automatic academic year assignment and filtering
+- Tag-based organization for easy content discovery
 
 ## 👨‍🏫 Teacher Tools
-- Weekly plan creation and management
-- Resource linking and organization
-- Progress tracking
-- Student access management
-- Course section administration
+- Weekly plan creation and management with learning objectives
+- Resource linking and organization within notes
+- Progress tracking across course sections
+- Student access management and role-based permissions
+- Course section administration and scheduling
 
 ## ⚙️ Administrative Features
 - User role management (admin/teacher/student)
+- Academic year management and filtering
 - System settings configuration
 - Usage statistics and reporting
 - Backup and maintenance tools
-
 
 ## 💻 Technical Requirements
 - PHP 7.4 or higher
@@ -47,8 +59,7 @@
 - Encrypted password storage and secure session handling
 - Input validation and prepared statements
 - Environment-based configuration and secure file handling
-- **NEW**: Remember Me functionality for persistent login sessions
-
+- Remember Me functionality for persistent login sessions
 
 ## Configuration
 
@@ -64,8 +75,6 @@ Edit the `.env` file with your database credentials and other configuration valu
 - Never commit the `.env` file to version control
 - Keep your database credentials secure
 - The `.env` file is automatically ignored by git
-
-
 
 ## Installation
 
@@ -123,9 +132,19 @@ Default security settings (configurable in database):
 
 ## Usage
 
+### For Teachers
 1. Access the application through your web browser
-2. Register a new account or login with existing credentials
-3. Create and manage your notes, courses, and teaching materials
+2. Create courses and sections for your classes
+3. Add daily learning summaries after each class session
+4. Include key concepts, learning objectives, and resources
+5. Use tags to organize content for easy student discovery
+
+### For Students
+1. Access the application through your web browser
+2. Browse courses and sections you're enrolled in
+3. Review daily learning summaries from missed or attended classes
+4. Use search functionality to find specific topics or concepts
+5. Access linked resources and materials
 
 ## Security Best Practices
 
