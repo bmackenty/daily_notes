@@ -45,9 +45,6 @@ function human_timing($timestamp) {
 
             <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link" id="overview-tab" data-bs-toggle="tab" href="#overview">Overview</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link active" id="courses-tab" data-bs-toggle="tab" href="#courses">Courses</a>
                 </li>
                 <li class="nav-item">
@@ -68,135 +65,7 @@ function human_timing($timestamp) {
             </ul>
 
             <div class="tab-content mb-5" id="dashboardContent">
-                <!-- Overview Tab -->
-                <div class="tab-pane fade" id="overview">
-                    <div class="row">
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Active Academic Year</h5>
-                                    <?php if ($activeYear): ?>
-                                        <p class="card-text"><?= htmlspecialchars($activeYear['name']) ?></p>
-                                    <?php else: ?>
-                                        <p class="text-warning">No active academic year set</p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Courses</h5>
-                                    <p class="card-text"><?= count($courses) ?> courses</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Sections</h5>
-                                    <p class="card-text">
-                                        <?php
-                                        $totalSections = 0;
-                                        foreach ($courses as $course) {
-                                            $sections = $sectionModel->getAllByCourse($course['id']);
-                                            $totalSections += count($sections);
-                                        }
-                                        echo $totalSections . ' sections';
-                                        ?>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Weekly Plans Count -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">Weekly Topics per Course</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Course</th>
-                                                    <th>Weekly Topics</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($courses as $course): ?>
-                                                    <tr>
-                                                        <td><?= htmlspecialchars($course['name']) ?></td>
-                                                        <td>
-                                                            <span class="badge bg-primary">
-                                                                <?= $weeklyPlanCounts[$course['id']] ?? 0 ?>
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Daily Notes Count -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">Daily Notes per Section</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Course</th>
-                                                    <th>Section</th>
-                                                    <th>Notes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($courses as $course): 
-                                                    $sections = $sectionModel->getAllByCourse($course['id']);
-                                                    foreach ($sections as $section):
-                                                ?>
-                                                    <tr>
-                                                        <td><?= htmlspecialchars($course['name']) ?></td>
-                                                        <td>
-                                                            <a href="/admin/sections/<?= $section['id'] ?>/edit" class="text-decoration-none">
-                                                                <?= htmlspecialchars($section['name']) ?>
-                                                            </a>
-                                                        </td>
-                                                        <td>
-                                               
-                                                            <a href="/admin/sections/<?= $section['id'] ?>/notes/create" 
-                                                                class="btn btn-sm btn-success">New Daily Note</a>
-                                                            <a href="/admin/sections/<?= $section['id'] ?>/edit" 
-                                                               class="btn btn-sm btn-primary">Edit</a>
-                                                            <?php if ($settings['show_delete_buttons'] === 'true'): ?>
-                                                                <a href="/admin/sections/<?= $section['id'] ?>/delete" 
-                                                                   class="btn btn-sm btn-danger"
-                                                                   onclick="return confirm('Are you sure you want to delete this section?')">Delete</a>
-                                                            <?php endif; ?>
-                                                        </td>
-                                                    </tr>
-                                                <?php 
-                                                    endforeach;
-                                                endforeach; 
-                                                ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            
 
                 <!-- Courses Tab -->
                 <div class="tab-pane fade show active" id="courses">
