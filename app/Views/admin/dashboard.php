@@ -87,7 +87,7 @@ function human_timing($timestamp) {
                                             <th>Course</th>
                                             <th>Section</th>
                                             <th>Room</th>
-                                            <th>Notes (Current Year)</th>
+                                            <th class="text-center">Notes (Current Year)</th>
                                             <th>Last Note</th>
                                             <th>Actions</th>
                                         </tr>
@@ -110,7 +110,7 @@ function human_timing($timestamp) {
                                                 <td>
                                                     <?= htmlspecialchars($section['meeting_place'] ?? '') ?>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <?php 
                                                     $currentYearNotes = 0;
                                                     if (isset($notes[$section['id']]) && !empty($notes[$section['id']])) {
@@ -121,9 +121,9 @@ function human_timing($timestamp) {
                                                         }
                                                     }
                                                     ?>
-                                                                                                         <span class="badge bg-info text-white">
-                                                         <?= $currentYearNotes ?> <?= $currentYearNotes == 1 ? 'note' : 'notes' ?>
-                                                     </span>
+                                                    <span class="badge bg-primary text-white">
+                                                        <?= $currentYearNotes ?> <?= $currentYearNotes == 1 ? 'note' : 'notes' ?>
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     <?php if (isset($notes[$section['id']]) && !empty($notes[$section['id']])): 
