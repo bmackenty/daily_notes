@@ -121,9 +121,11 @@ function human_timing($timestamp) {
                                                         }
                                                     }
                                                     ?>
-                                                    <span class="badge bg-primary text-white">
-                                                        <?= $currentYearNotes ?> <?= $currentYearNotes == 1 ? 'note' : 'notes' ?>
-                                                    </span>
+                                                    <a href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes" class="text-decoration-none">
+                                                        <span class="badge bg-primary text-white">
+                                                            <?= $currentYearNotes ?> <?= $currentYearNotes == 1 ? 'note' : 'notes' ?>
+                                                        </span>
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <?php if (isset($notes[$section['id']]) && !empty($notes[$section['id']])): 
@@ -626,6 +628,11 @@ function human_timing($timestamp) {
     display: block;
     width: 100%;
     height: 100%;
+}
+
+a .badge {
+    color: inherit;
+    text-decoration: none;
 }
 </style>
 
