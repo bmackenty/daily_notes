@@ -69,6 +69,30 @@ class AdminController {
     }
     
     /**
+     * Calculate the default date for new notes
+     * 
+     * Returns tomorrow's date, unless today is Friday, Saturday, or Sunday,
+     * in which case it returns the next Monday.
+     * 
+     * @return string Date in Y-m-d format
+     */
+    private function getDefaultNoteDate() {
+        $today = new DateTime();
+        $dayOfWeek = (int) $today->format('N'); // 1 = Monday, 7 = Sunday
+        
+        // If today is Friday (5), Saturday (6), or Sunday (7), set to next Monday
+        if ($dayOfWeek >= 5) {
+            $daysToAdd = 8 - $dayOfWeek; // Friday: +3, Saturday: +2, Sunday: +1
+            $today->add(new \DateInterval("P{$daysToAdd}D"));
+        } else {
+            // Otherwise, set to tomorrow
+            $today->add(new \DateInterval('P1D'));
+        }
+        
+        return $today->format('Y-m-d');
+    }
+    
+    /**
      * Displays the admin dashboard with overview of all system components
      * Shows courses, sections, notes, teacher profiles, and learning statements
      */
@@ -305,6 +329,7 @@ class AdminController {
         $lastNote = $this->noteModel->getLastBySection($sectionId);
         
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $defaultDate = $this->getDefaultNoteDate();
             require ROOT_PATH . '/app/Views/admin/notes/create.php';
         } else {
             error_log('POST data: ' . print_r($_POST, true));
@@ -755,6 +780,7 @@ class AdminController {
         $section = $this->sectionModel->get($sectionId);
         $course = $this->courseModel->get($section['course_id']);
         $lastNote = $this->noteModel->getLastBySection($sectionId);
+        $defaultDate = $this->getDefaultNoteDate();
 
         require ROOT_PATH . '/app/Views/admin/notes/create.php';
     }

@@ -56,7 +56,7 @@
                         <div class="mb-3">
                             <label>Date</label>
                             <input type="date" name="date" class="form-control" required 
-                                   value="<?= date('Y-m-d') ?>">
+                                   value="<?= $defaultDate ?>">
                         </div>
 
                         <div class="mb-3">
