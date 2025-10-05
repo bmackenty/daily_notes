@@ -51,7 +51,7 @@ function formatRelativeDate($date) {
         ?>
         <div class="alert alert-info d-flex align-items-center" role="alert">
             <i class="bi bi-clock me-2"></i>
-            <span class="me-2">Server time (Warsaw):</span>
+            <span class="me-2">Warsaw Time:</span>
             <strong><?= date('l, F j, Y \a\t g:i A T') ?></strong>
         </div>
     </section>
