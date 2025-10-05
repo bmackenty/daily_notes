@@ -343,7 +343,7 @@ class AdminController {
                 Logger::log("Failed to create daily note for section ID: $sectionId", 'ERROR');
                 $_SESSION['error'] = 'Failed to create daily note';
             }
-            header("Location: /admin/courses/{$course['id']}/sections");
+            header("Location: /admin/dashboard");
             exit;
         }
     }
