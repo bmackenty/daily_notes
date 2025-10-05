@@ -1,5 +1,33 @@
 <?php require ROOT_PATH . '/app/Views/partials/header.php'; ?>
 
+<?php
+/**
+ * Helper function to format relative date
+ * Returns human-readable relative time (e.g., "2 days ago", "in 3 days", "today")
+ */
+function formatRelativeDate($date) {
+    $noteDate = new DateTime($date);
+    $today = new DateTime();
+    $today->setTime(0, 0, 0); // Reset time to start of day
+    $noteDate->setTime(0, 0, 0); // Reset time to start of day
+    
+    $diff = $today->diff($noteDate);
+    $daysDiff = (int)$diff->format('%r%a'); // %r gives sign, %a gives absolute days
+    
+    if ($daysDiff === 0) {
+        return 'today';
+    } elseif ($daysDiff === 1) {
+        return 'tomorrow';
+    } elseif ($daysDiff === -1) {
+        return 'yesterday';
+    } elseif ($daysDiff > 0) {
+        return 'in ' . $daysDiff . ' day' . ($daysDiff > 1 ? 's' : '');
+    } else {
+        return abs($daysDiff) . ' day' . (abs($daysDiff) > 1 ? 's' : '') . ' ago';
+    }
+}
+?>
+
 <!-- Add Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
@@ -15,6 +43,19 @@
   #courses-sections .nowrap { white-space: nowrap; }
 </style>
 <div class="container mt-5">
+    <!-- Server Time Display -->
+    <section class="mb-4">
+        <?php 
+        // Set timezone to Warsaw, Poland
+        date_default_timezone_set('Europe/Warsaw');
+        ?>
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-clock me-2"></i>
+            <span class="me-2">Server time (Warsaw):</span>
+            <strong><?= date('l, F j, Y \a\t g:i A T') ?></strong>
+        </div>
+    </section>
+
     <!-- Feature Grid Section -->
     <section class="mb-5">
         <h2 class="mb-4">Welcome</h2>
@@ -75,7 +116,9 @@
                             <td class="nowrap"><?= htmlspecialchars($section['meeting_place'] ?? '') ?></td>
                             <td class="nowrap">
                                 <?php if (!empty($notes[$section['id']])): 
-                                    $latestNote = reset($notes[$section['id']]); ?>
+                                    $latestNote = reset($notes[$section['id']]); 
+                                    $relativeDate = formatRelativeDate($latestNote['date']);
+                                    $fullDate = date('M j, Y', strtotime($latestNote['date'])); ?>
                                     <i class="bi bi-calendar-event text-success me-1"></i>
                                     <a
                                         href="/courses/<?= $course['id'] ?>/sections/<?= $section['id'] ?>/notes"
@@ -84,7 +127,7 @@
                                         title="View all notes for this section"
                                     >
                                         <span class="badge bg-light text-secondary border badge-date">
-                                            <?= htmlspecialchars(date('M j, Y', strtotime($latestNote['date']))) ?>
+                                            <?= htmlspecialchars($fullDate) ?> (<?= htmlspecialchars($relativeDate) ?>)
                                         </span>
                                     </a>
                                 <?php else: ?>
