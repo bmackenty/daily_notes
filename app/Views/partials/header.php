@@ -46,6 +46,15 @@ $activeYear = $academicYearModel->getActive();
                     <?php endif; ?>
                 </ul>
                 <div class="d-flex align-items-center">
+                    <!-- Warsaw Time -->
+                    <?php 
+                    date_default_timezone_set('Europe/Warsaw');
+                    ?>
+                    <span class="navbar-text text-white-50 small me-3" data-bs-toggle="tooltip" title="Warsaw, Poland Time">
+                        <i class="bi bi-clock me-1"></i>
+                        <?= date('M j, g:i A') ?>
+                    </span>
+                    
                     <!-- Dark Mode Toggle -->
                     <button class="btn btn-outline-light btn-sm me-3" id="darkModeToggle" type="button" title="Toggle Dark Mode">
                         <i class="bi bi-moon-fill" id="darkModeIcon"></i>

@@ -43,19 +43,6 @@ function formatRelativeDate($date) {
   #courses-sections .nowrap { white-space: nowrap; }
 </style>
 <div class="container mt-5">
-    <!-- Server Time Display -->
-    <section class="mb-4">
-        <?php 
-        // Set timezone to Warsaw, Poland
-        date_default_timezone_set('Europe/Warsaw');
-        ?>
-        <div class="alert alert-info d-flex align-items-center" role="alert">
-            <i class="bi bi-clock me-2"></i>
-            <span class="me-2">Warsaw Time:</span>
-            <strong><?= date('l, F j, Y \a\t g:i A T') ?></strong>
-        </div>
-    </section>
-
     <!-- Feature Grid Section -->
     <section class="mb-5">
         <h2 class="mb-4">Welcome</h2>
