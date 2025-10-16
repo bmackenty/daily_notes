@@ -15,7 +15,7 @@ class UserTest extends TestCase {
         // Create users table
         $this->pdo->exec("CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
+            name TEXT NOT NULL,
             email TEXT NOT NULL,
             password TEXT NOT NULL,
             role TEXT NOT NULL,
@@ -39,7 +39,7 @@ class UserTest extends TestCase {
         
         $this->assertIsArray($foundUser);
         $this->assertEquals($userData['email'], $foundUser['email']);
-        $this->assertEquals($userData['username'], $foundUser['username']);
+        $this->assertEquals($userData['name'], $foundUser['name']);
     }
 
     public function testValidatePassword() {
