@@ -41,6 +41,25 @@ function formatRelativeDate($date) {
   #courses-sections .badge-date { font-weight: 500; }
   #courses-sections .text-tight { line-height: 1.1; }
   #courses-sections .nowrap { white-space: nowrap; }
+  
+  /* Course header background - adapts to light/dark mode */
+  #courses-sections .card-header.course-header-bg {
+    background-color: #f8f9fa;
+    color: inherit;
+  }
+  
+  [data-bs-theme="dark"] #courses-sections .card-header.course-header-bg {
+    background-color: #2d3238;
+    color: #f8f9fa;
+    border-bottom-color: #495057;
+  }
+  
+  /* Badge styles for dark mode */
+  [data-bs-theme="dark"] #courses-sections .badge.bg-light {
+    background-color: #495057 !important;
+    color: #f8f9fa !important;
+    border-color: #6c757d !important;
+  }
 </style>
 <div class="container mt-5">
     <!-- Feature Grid Section -->
@@ -76,7 +95,7 @@ function formatRelativeDate($date) {
     <h2 class="mb-3">Courses and Sections</h2>
     <?php foreach ($courses as $course): ?>
     <div class="card mb-3">
-        <div class="card-header bg-light">
+        <div class="card-header course-header-bg">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="h5 mb-0 text-tight">
                     <i class="bi bi-book text-primary me-2"></i>

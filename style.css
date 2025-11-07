@@ -105,3 +105,22 @@ body {
 [data-bs-theme="dark"] .modal-footer {
     border-color: var(--border-color);
 }
+
+/* Course header background - adapts to light/dark mode */
+#courses-sections .card-header.course-header-bg {
+    background-color: #f8f9fa;
+    color: inherit;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-bs-theme="dark"] #courses-sections .card-header.course-header-bg {
+    background-color: #2d3238;
+    color: #f8f9fa;
+    border-bottom-color: #495057;
+}
+
+[data-bs-theme="dark"] #courses-sections .badge.bg-light {
+    background-color: #495057 !important;
+    color: #f8f9fa !important;
+    border-color: #6c757d !important;
+}
