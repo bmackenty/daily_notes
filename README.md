@@ -63,7 +63,8 @@ Daily Learning Notes give you a quick, clear summary of what we covered in class
 
 ## Configuration
 
-The application uses environment variables for configuration. Copy the `.env.example` file to `.env` and update the values:
+The application uses environment variables for configuration.
+Copy the `.env.example` file to `.env` and update the values:
 
 ```bash
 cp .env.example .env
