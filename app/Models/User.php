@@ -16,9 +16,10 @@ class User {
     }
     
     public function create($data) {
-        $sql = "INSERT INTO users (email, password, role) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([
+            $data['name'] ?? null,
             $data['email'],
             $data['password'],
             $data['role'] ?? 'user'

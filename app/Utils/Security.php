@@ -423,6 +423,17 @@ class Security {
     }
 
     /**
+     * Verifies a plaintext password against a hash
+     *
+     * @param string $password Plain text password
+     * @param string $hash     Hashed password
+     * @return bool True if password matches the hash, false otherwise
+     */
+    public function verifyPassword($password, $hash) {
+        return password_verify($password, $hash);
+    }
+
+    /**
      * Generates a CSRF token for form protection
      * Creates a new token if one doesn't exist in the session
      * Uses cryptographically secure random bytes
