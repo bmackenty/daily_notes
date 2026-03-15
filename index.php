@@ -59,12 +59,17 @@ require_once ROOT_PATH . '/app/Models/WeeklyPlan.php';      // Weekly planning
 require_once ROOT_PATH . '/app/Models/TeacherProfile.php';  // Teacher profiles
 require_once ROOT_PATH . '/app/Models/Tag.php';             // Tag management
 require_once ROOT_PATH . '/app/Models/LearningStatement.php'; // Learning statements
+require_once ROOT_PATH . '/app/Models/PredictedGradeStudent.php';
+require_once ROOT_PATH . '/app/Models/PredictedGradeEntry.php';
+require_once ROOT_PATH . '/app/Models/PredictedGradeConfig.php';
+require_once ROOT_PATH . '/app/Utils/PredictedGradeCalculator.php';
 
 // Load controller classes
 require_once ROOT_PATH . '/app/Controllers/AuthController.php';    // Authentication handling
 require_once ROOT_PATH . '/app/Controllers/HomeController.php';    // Home page handling
 require_once ROOT_PATH . '/app/Controllers/AdminController.php';   // Admin functionality
 require_once ROOT_PATH . '/app/Controllers/CourseController.php';  // Course management
+require_once ROOT_PATH . '/app/Controllers/PredictedGradeController.php';  // IB CS Predicted grade
 
 // Load database configuration and establish connection
 require_once ROOT_PATH . '/config/database.php';

@@ -84,6 +84,20 @@ function formatRelativeDate($date) {
                     </div>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="card h-100 border-success">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-calculator text-success me-3" style="font-size: 2rem;"></i>
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">IB CS Predicted Grade</h5>
+                                <p class="card-text">See your current predicted grade based on your scores in Paper 1, IA, and Paper 2. Enter your grades (with optional weights for multiple tests) and view the exact calculation. Use a unique code to save and return to your data — no password needed.</p>
+                                <a href="/predicted-grade" class="btn btn-success">Open Predicted Grade</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

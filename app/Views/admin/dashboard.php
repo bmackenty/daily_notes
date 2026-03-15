@@ -62,6 +62,9 @@ function human_timing($timestamp) {
                 <li class="nav-item">
                     <a class="nav-link" id="learning-statements-tab" data-bs-toggle="tab" href="#learning-statements">Learning Statements</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/predicted-grade">Predicted Grades</a>
+                </li>
             </ul>
 
             <div class="tab-content mb-5" id="dashboardContent">

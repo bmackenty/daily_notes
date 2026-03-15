@@ -3,7 +3,17 @@ use App\Controllers\AuthController;
 use App\Controllers\HomeController;
 use App\Controllers\AdminController;
 use App\Controllers\CourseController;
+use App\Controllers\PredictedGradeController;
 use App\Models\Setting;
+
+// Ensure Predicted Grade classes are loaded (in case entry point is public/index.php without full bootstrap)
+if (!class_exists('App\Controllers\PredictedGradeController', false)) {
+    require_once ROOT_PATH . '/app/Models/PredictedGradeStudent.php';
+    require_once ROOT_PATH . '/app/Models/PredictedGradeEntry.php';
+    require_once ROOT_PATH . '/app/Models/PredictedGradeConfig.php';
+    require_once ROOT_PATH . '/app/Utils/PredictedGradeCalculator.php';
+    require_once ROOT_PATH . '/app/Controllers/PredictedGradeController.php';
+}
 
 $request_method = $_SERVER['REQUEST_METHOD'];
 $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -14,7 +24,7 @@ $settingModel = new Setting($pdo);
 $maintenanceMode = $settingModel->get('maintenance_mode') === 'true';
 
 // Allowed routes during maintenance
-$allowedRoutes = ['/login', '/logout', '/admin', '/admin/dashboard', '/admin/settings'];
+$allowedRoutes = ['/login', '/logout', '/admin', '/admin/dashboard', '/admin/settings', '/admin/predicted-grade', '/admin/predicted-grade/save-config', '/predicted-grade', '/predicted-grade/access', '/predicted-grade/start', '/predicted-grade/entry', '/predicted-grade/entry/delete', '/predicted-grade/logout'];
 
 if ($maintenanceMode && !in_array($request, $allowedRoutes) && 
     (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin')) {
@@ -154,6 +164,20 @@ switch ($request) {
     case (preg_match('/^\/syllabus\/(\d+)$/', $request, $matches) ? true : false):
         $controller = new HomeController($pdo);
         $controller->syllabus($matches[1]);
+        break;
+
+    case '/admin/predicted-grade':
+        $controller = new AdminController($pdo);
+        $controller->predictedGrade();
+        break;
+    case '/admin/predicted-grade/save-config':
+        if ($request_method === 'POST') {
+            $controller = new AdminController($pdo);
+            $controller->predictedGradeSaveConfig();
+        } else {
+            header('Location: /admin/predicted-grade');
+            exit;
+        }
         break;
 
     case '/admin/settings/academic-years':
@@ -326,6 +350,47 @@ switch ($request) {
         if ($request_method === 'POST') {
             echo $controller->deleteLearningStatement($matches[1]);
         }
+        break;
+
+    // IB CS Predicted Grade (public, no login)
+    case '/predicted-grade':
+        $controller = new PredictedGradeController($pdo);
+        $controller->index();
+        break;
+    case '/predicted-grade/access':
+        if ($request_method === 'POST') {
+            (new PredictedGradeController($pdo))->access();
+        } else {
+            header('Location: /predicted-grade');
+            exit;
+        }
+        break;
+    case '/predicted-grade/start':
+        if ($request_method === 'POST') {
+            (new PredictedGradeController($pdo))->start();
+        } else {
+            header('Location: /predicted-grade');
+            exit;
+        }
+        break;
+    case '/predicted-grade/entry':
+        if ($request_method === 'POST') {
+            (new PredictedGradeController($pdo))->addEntry();
+        } else {
+            header('Location: /predicted-grade');
+            exit;
+        }
+        break;
+    case '/predicted-grade/entry/delete':
+        if ($request_method === 'POST') {
+            (new PredictedGradeController($pdo))->deleteEntry();
+        } else {
+            header('Location: /predicted-grade');
+            exit;
+        }
+        break;
+    case '/predicted-grade/logout':
+        (new PredictedGradeController($pdo))->logout();
         break;
 
     default:

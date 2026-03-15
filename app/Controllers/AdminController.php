@@ -11,6 +11,8 @@ use App\Models\WeeklyPlan;
 use DateTime;
 use App\Models\TeacherProfile;
 use App\Models\LearningStatement;
+use App\Models\PredictedGradeConfig;
+use App\Models\PredictedGradeStudent;
 
 /**
  * AdminController
@@ -963,5 +965,41 @@ class AdminController {
             header('Location: /admin/dashboard#settings');
             exit;
         }
+    }
+
+    /**
+     * Admin: view predicted grade tool — list students and edit weights config.
+     */
+    public function predictedGrade() {
+        $configModel = new PredictedGradeConfig($this->db);
+        $weights = $configModel->getWeights();
+        $studentModel = new PredictedGradeStudent($this->db);
+        $students = $studentModel->getAll();
+        require ROOT_PATH . '/app/Views/admin/predicted_grade.php';
+    }
+
+    /**
+     * Admin: save predicted grade config. Paper 1 + IA + Paper 2 must sum to 100%. Soft weight is separate (0–30%).
+     */
+    public function predictedGradeSaveConfig() {
+        $configModel = new PredictedGradeConfig($this->db);
+        $p1 = isset($_POST['weight_paper1']) ? (float) $_POST['weight_paper1'] : 40;
+        $ia = isset($_POST['weight_ia']) ? (float) $_POST['weight_ia'] : 20;
+        $p2 = isset($_POST['weight_paper2']) ? (float) $_POST['weight_paper2'] : 40;
+        $examSum = $p1 + $ia + $p2;
+        if (abs($examSum - 100) > 0.01) {
+            $_SESSION['error'] = 'Paper 1 + IA + Paper 2 must sum to 100%. They sum to ' . round($examSum, 1) . '%.';
+            header('Location: /admin/predicted-grade');
+            exit;
+        }
+        $configModel->set('weight_paper1', $p1 / 100);
+        $configModel->set('weight_ia', $ia / 100);
+        $configModel->set('weight_paper2', $p2 / 100);
+        $soft = isset($_POST['weight_soft']) ? (float) $_POST['weight_soft'] : 0;
+        $soft = max(0, min(30, $soft));
+        $configModel->set('weight_soft', $soft / 100);
+        $_SESSION['success'] = 'Predicted grade weights saved.';
+        header('Location: /admin/predicted-grade');
+        exit;
     }
 } 
