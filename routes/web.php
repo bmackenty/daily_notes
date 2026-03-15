@@ -24,7 +24,7 @@ $settingModel = new Setting($pdo);
 $maintenanceMode = $settingModel->get('maintenance_mode') === 'true';
 
 // Allowed routes during maintenance
-$allowedRoutes = ['/login', '/logout', '/admin', '/admin/dashboard', '/admin/settings', '/admin/predicted-grade', '/admin/predicted-grade/save-config', '/predicted-grade', '/predicted-grade/access', '/predicted-grade/start', '/predicted-grade/entry', '/predicted-grade/entry/delete', '/predicted-grade/logout'];
+$allowedRoutes = ['/login', '/logout', '/admin', '/admin/dashboard', '/admin/settings', '/admin/predicted-grade', '/admin/predicted-grade/save-config', '/predicted-grade', '/predicted-grade/access', '/predicted-grade/start', '/predicted-grade/entry', '/predicted-grade/entry/delete', '/predicted-grade/save-weight', '/predicted-grade/logout'];
 
 if ($maintenanceMode && !in_array($request, $allowedRoutes) && 
     (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin')) {
@@ -384,6 +384,14 @@ switch ($request) {
     case '/predicted-grade/entry/delete':
         if ($request_method === 'POST') {
             (new PredictedGradeController($pdo))->deleteEntry();
+        } else {
+            header('Location: /predicted-grade');
+            exit;
+        }
+        break;
+    case '/predicted-grade/save-weight':
+        if ($request_method === 'POST') {
+            (new PredictedGradeController($pdo))->saveWeight();
         } else {
             header('Location: /predicted-grade');
             exit;

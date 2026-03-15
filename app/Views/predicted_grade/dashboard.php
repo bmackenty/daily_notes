@@ -21,6 +21,20 @@ require ROOT_PATH . '/app/Views/partials/header.php';
 [data-bs-theme="dark"] .pg-paper2  { background-color: rgba(253, 126, 20, 0.15); }
 [data-bs-theme="dark"] .pg-soft    { background-color: rgba(111, 66, 193, 0.15); }
 .pg-math-block { font-family: ui-monospace, monospace; font-size: 0.95rem; }
+/* Dark mode: softer grey for tables (no bright white) */
+[data-bs-theme="dark"] .pg-entries-table .table-light,
+[data-bs-theme="dark"] .pg-entries-table thead th {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+    color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+[data-bs-theme="dark"] .pg-entries-table tbody td {
+    border-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+}
+[data-bs-theme="dark"] .pg-entries-table tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.05);
+}
 </style>
 
 <div class="container mt-3 mb-5">
@@ -53,9 +67,51 @@ require ROOT_PATH . '/app/Views/partials/header.php';
             <?php if ($result['ib_grade'] !== null): ?>
                 <p class="display-4 mb-0 text-primary"><?= (int) $result['ib_grade'] ?></p>
                 <p class="text-muted small mb-0">Predicted grade (1–7) · Final average <?= number_format($result['final_avg'] ?? $result['final_percent'], 1) ?> (1–7 scale)</p>
+                <!-- Breakdown right under the grade (large, clear) -->
+                <div class="pg-breakdown mt-3 pt-3 border-top">
+                    <p class="mb-1 small text-muted">Averages by component</p>
+                    <p class="pg-breakdown-values mb-0 fs-5">
+                        <span class="text-primary">Paper 1</span> <?= $result['paper1_avg'] !== null ? number_format($result['paper1_avg'], 1) : '—' ?>
+                        · <span class="text-success">IA</span> <?= $result['ia_avg'] !== null ? number_format($result['ia_avg'], 1) : '—' ?>
+                        · <span class="text-warning">Paper 2</span> <?= $result['paper2_avg'] !== null ? number_format($result['paper2_avg'], 1) : '—' ?>
+                        <?php if ($weightSoft > 0): ?>
+                        · <span class="text-secondary">Homework & habits</span> <?= ($result['soft_avg'] ?? null) !== null ? number_format($result['soft_avg'], 1) : '—' ?>
+                        <?php endif; ?>
+                    </p>
+                    <p class="mb-0 mt-1 small">
+                        <strong>Exam avg</strong> <?= ($result['exam_avg'] ?? null) !== null ? number_format($result['exam_avg'], 1) : '—' ?>
+                        <?php if ($weightSoft > 0 && ($result['soft_avg'] ?? null) !== null): ?>
+                        → <strong>Final</strong> <?= number_format($result['final_avg'] ?? $result['final_percent'], 1) ?>
+                        <?php endif; ?>
+                    </p>
+                </div>
             <?php else: ?>
                 <p class="text-muted mb-0">Add grades (1–7) in the sections below to see your predicted grade.</p>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Homework & habits weight: set by teacher / student override -->
+    <div class="card mb-4 pg-soft">
+        <div class="card-header text-white" style="background-color:#6f42c1">
+            <h3 class="h6 mb-0">Homework & habits weight</h3>
+        </div>
+        <div class="card-body">
+            <p class="small text-muted mb-3">If your teacher gives a percentage for homework & habits (e.g. 10%), set it here. Final grade = (100−this)% × Exam avg + this% × Homework & habits avg. Use 0% if not used.</p>
+            <form method="post" action="/predicted-grade/save-weight" class="row g-3 align-items-end">
+                <div class="col-auto">
+                    <label class="form-label small mb-0">Weight (%)</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="range" class="form-range" min="0" max="30" step="0.5" value="<?= (int)round($weightSoft * 100) ?>" id="weightSoftRange" style="width:8rem">
+                        <input type="number" name="weight_soft" class="form-control form-control-sm" min="0" max="30" step="0.5" value="<?= (int)round($weightSoft * 100) ?>" id="weightSoftNumber" style="width:4rem" aria-label="Weight percent">
+                        <span>%</span>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-secondary btn-sm">Save</button>
+                </div>
+            </form>
+            <p class="small text-muted mb-0 mt-2">Current: <strong><?= (int)round($weightSoft * 100) ?>%</strong></p>
         </div>
     </div>
 
@@ -80,25 +136,13 @@ require ROOT_PATH . '/app/Views/partials/header.php';
             <?php else: ?>
             <p class="mb-1"><code>Final = Exam avg</code> (homework & habits weight is 0)</p>
             <?php endif; ?>
-            <p class="mb-1"><code>Predicted grade = round(Final) → 1 to 7</code></p>
+            <p class="mb-0"><code>Predicted grade = round(Final) → 1 to 7</code></p>
             <?php if (($result['final_avg'] ?? $result['final_percent']) !== null): ?>
-                <p class="mb-1 mt-2">Your numbers:</p>
-                <p class="mb-1">
-                    <span class="text-primary">Paper 1</span> = <?= $result['paper1_avg'] !== null ? number_format($result['paper1_avg'], 1) : '—' ?> &nbsp;
-                    <span class="text-success">IA</span> = <?= $result['ia_avg'] !== null ? number_format($result['ia_avg'], 1) : '—' ?> &nbsp;
-                    <span class="text-warning">Paper 2</span> = <?= $result['paper2_avg'] !== null ? number_format($result['paper2_avg'], 1) : '—' ?> &nbsp;
-                    → <strong>Exam avg</strong> = <?= ($result['exam_avg'] ?? null) !== null ? number_format($result['exam_avg'], 1) : '—' ?>
-                    <?php if ($weightSoft > 0): ?>
-                    &nbsp; &nbsp; <span class="text-secondary">Homework & habits avg</span> = <?= ($result['soft_avg'] ?? null) !== null ? number_format($result['soft_avg'], 1) : '—' ?>
-                    <?php endif; ?>
-                </p>
-                <p class="mb-0">
-                    <?php if ($weightSoft > 0 && ($result['soft_avg'] ?? null) !== null): ?>
-                    <code>Final = (<?= (int)round((1-$weightSoft)*100) ?>%×<?= number_format($result['exam_avg'] ?? 0, 1) ?>) + (<?= (int)round($weightSoft*100) ?>%×<?= number_format($result['soft_avg'], 1) ?>) = <?= number_format($result['final_avg'] ?? $result['final_percent'], 1) ?> → predicted <strong><?= (int)($result['ib_grade']) ?></strong></code>
-                    <?php else: ?>
-                    <code>Final = Exam avg = <?= number_format($result['exam_avg'] ?? $result['final_avg'] ?? $result['final_percent'], 1) ?> → predicted <strong><?= (int)($result['ib_grade']) ?></strong></code>
-                    <?php endif; ?>
-                </p>
+                <p class="mb-0 mt-2 small text-muted">Formula with your numbers: <?php if ($weightSoft > 0 && ($result['soft_avg'] ?? null) !== null): ?>
+                    <code>Final = (<?= (int)round((1-$weightSoft)*100) ?>%×<?= number_format($result['exam_avg'] ?? 0, 1) ?>) + (<?= (int)round($weightSoft*100) ?>%×<?= number_format($result['soft_avg'], 1) ?>) = <?= number_format($result['final_avg'] ?? $result['final_percent'], 1) ?> → <strong><?= (int)($result['ib_grade']) ?></strong></code>
+                <?php else: ?>
+                    <code>Final = Exam avg = <?= number_format($result['exam_avg'] ?? $result['final_avg'] ?? $result['final_percent'], 1) ?> → <strong><?= (int)($result['ib_grade']) ?></strong></code>
+                <?php endif; ?></p>
             <?php endif; ?>
         </div>
     </div>
@@ -116,17 +160,17 @@ require ROOT_PATH . '/app/Views/partials/header.php';
                 $topicLabel = \App\Models\PredictedGradeEntry::getCategoryLabel($cat);
                 ?>
                 <div class="mb-4">
-                    <strong><?= htmlspecialchars($topicLabel) ?></strong>
+                    <strong><?= htmlspecialchars($topicLabel) ?><?php $unitCode = \App\Models\PredictedGradeEntry::getCategoryUnitCode($cat); if ($unitCode): ?> <span class="text-muted fw-normal">(<?= htmlspecialchars($unitCode) ?>)</span><?php endif; ?></strong>
                     <?php if ($avg !== null): ?><span class="text-muted small">(avg <?= number_format($avg, 1) ?>)</span><?php endif; ?>
                     <div class="table-responsive mt-1">
-                        <table class="table table-sm table-bordered mb-2" style="max-width: 24rem;">
+                        <table class="table table-sm table-bordered mb-2 pg-entries-table" style="max-width: 24rem;">
                             <thead class="table-light">
                                 <tr><th>Label</th><th>Grade (1–7)</th><th class="text-end">Actions</th></tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($entries as $e): ?>
+                                <?php foreach ($entries as $i => $e): $displayLabel = (!empty(trim((string)($e['label'] ?? '')))) ? htmlspecialchars($e['label']) : ('Test ' . ($i + 1)); ?>
                                 <tr>
-                                    <td><?= $e['label'] ? htmlspecialchars($e['label']) : '—' ?></td>
+                                    <td><?= $displayLabel ?></td>
                                     <td><?= (int)round($e['score']) ?></td>
                                     <td class="text-end">
                                         <form method="post" action="/predicted-grade/entry/delete" class="d-inline">
@@ -157,16 +201,16 @@ require ROOT_PATH . '/app/Views/partials/header.php';
             <h3 class="h6 mb-0">IA (<?= (int)round($w['ia']*100) ?>%)</h3>
         </div>
         <div class="card-body">
-            <?php $cat = 'ia'; $entries = $entriesByCategory[$cat] ?? []; $avg = $categoryAvg[$cat] ?? null; $topicLabel = \App\Models\PredictedGradeEntry::getCategoryLabel($cat); ?>
-            <strong><?= htmlspecialchars($topicLabel) ?></strong>
+            <?php $cat = 'ia'; $entries = $entriesByCategory[$cat] ?? []; $avg = $categoryAvg[$cat] ?? null; $topicLabel = \App\Models\PredictedGradeEntry::getCategoryLabel($cat); $unitCode = \App\Models\PredictedGradeEntry::getCategoryUnitCode($cat); ?>
+            <strong><?= htmlspecialchars($topicLabel) ?><?php if ($unitCode): ?> <span class="text-muted fw-normal">(<?= htmlspecialchars($unitCode) ?>)</span><?php endif; ?></strong>
             <?php if ($avg !== null): ?><span class="text-muted small">(avg <?= number_format($avg, 1) ?>)</span><?php endif; ?>
             <div class="table-responsive mt-1">
-                <table class="table table-sm table-bordered mb-2" style="max-width: 24rem;">
+                <table class="table table-sm table-bordered mb-2 pg-entries-table" style="max-width: 24rem;">
                     <thead class="table-light"><tr><th>Label</th><th>Grade (1–7)</th><th class="text-end">Actions</th></tr></thead>
                     <tbody>
-                        <?php foreach ($entries as $e): ?>
+                        <?php foreach ($entries as $i => $e): $displayLabel = (!empty(trim((string)($e['label'] ?? '')))) ? htmlspecialchars($e['label']) : ('Test ' . ($i + 1)); ?>
                         <tr>
-                            <td><?= $e['label'] ? htmlspecialchars($e['label']) : '—' ?></td>
+                            <td><?= $displayLabel ?></td>
                             <td><?= (int)round($e['score']) ?></td>
                             <td class="text-end">
                                 <form method="post" action="/predicted-grade/entry/delete" class="d-inline">
@@ -198,15 +242,16 @@ require ROOT_PATH . '/app/Views/partials/header.php';
             <?php foreach ($paper2Topics as $cat): ?>
                 <?php $entries = $entriesByCategory[$cat] ?? []; $avg = $categoryAvg[$cat] ?? null; $topicLabel = \App\Models\PredictedGradeEntry::getCategoryLabel($cat); ?>
                 <div class="mb-4">
-                    <strong><?= htmlspecialchars($topicLabel) ?></strong>
+                    <?php $unitCode = \App\Models\PredictedGradeEntry::getCategoryUnitCode($cat); ?>
+                    <strong><?= htmlspecialchars($topicLabel) ?><?php if ($unitCode): ?> <span class="text-muted fw-normal">(<?= htmlspecialchars($unitCode) ?>)</span><?php endif; ?></strong>
                     <?php if ($avg !== null): ?><span class="text-muted small">(avg <?= number_format($avg, 1) ?>)</span><?php endif; ?>
                     <div class="table-responsive mt-1">
-                        <table class="table table-sm table-bordered mb-2" style="max-width: 24rem;">
+                        <table class="table table-sm table-bordered mb-2 pg-entries-table" style="max-width: 24rem;">
                             <thead class="table-light"><tr><th>Label</th><th>Grade (1–7)</th><th class="text-end">Actions</th></tr></thead>
                             <tbody>
-                                <?php foreach ($entries as $e): ?>
+                                <?php foreach ($entries as $i => $e): $displayLabel = (!empty(trim((string)($e['label'] ?? '')))) ? htmlspecialchars($e['label']) : ('Test ' . ($i + 1)); ?>
                                 <tr>
-                                    <td><?= $e['label'] ? htmlspecialchars($e['label']) : '—' ?></td>
+                                    <td><?= $displayLabel ?></td>
                                     <td><?= (int)round($e['score']) ?></td>
                                     <td class="text-end">
                                         <form method="post" action="/predicted-grade/entry/delete" class="d-inline">
@@ -242,15 +287,16 @@ require ROOT_PATH . '/app/Views/partials/header.php';
             <?php foreach ($softTopics as $cat): ?>
                 <?php $entries = $entriesByCategory[$cat] ?? []; $avg = $categoryAvg[$cat] ?? null; $topicLabel = \App\Models\PredictedGradeEntry::getCategoryLabel($cat); ?>
                 <div class="mb-4">
-                    <strong><?= htmlspecialchars($topicLabel) ?></strong>
+                    <?php $unitCode = \App\Models\PredictedGradeEntry::getCategoryUnitCode($cat); ?>
+                    <strong><?= htmlspecialchars($topicLabel) ?><?php if ($unitCode): ?> <span class="text-muted fw-normal">(<?= htmlspecialchars($unitCode) ?>)</span><?php endif; ?></strong>
                     <?php if ($avg !== null): ?><span class="text-muted small">(avg <?= number_format($avg, 1) ?>)</span><?php endif; ?>
                     <div class="table-responsive mt-1">
-                        <table class="table table-sm table-bordered mb-2" style="max-width: 24rem;">
+                        <table class="table table-sm table-bordered mb-2 pg-entries-table" style="max-width: 24rem;">
                             <thead class="table-light"><tr><th>Label</th><th>Grade (1–7)</th><th class="text-end">Actions</th></tr></thead>
                             <tbody>
-                                <?php foreach ($entries as $e): ?>
+                                <?php foreach ($entries as $i => $e): $displayLabel = (!empty(trim((string)($e['label'] ?? '')))) ? htmlspecialchars($e['label']) : ('Test ' . ($i + 1)); ?>
                                 <tr>
-                                    <td><?= $e['label'] ? htmlspecialchars($e['label']) : '—' ?></td>
+                                    <td><?= $displayLabel ?></td>
                                     <td><?= (int)round($e['score']) ?></td>
                                     <td class="text-end">
                                         <form method="post" action="/predicted-grade/entry/delete" class="d-inline">
@@ -288,6 +334,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
                 });
             }
+        });
+    }
+    var weightRange = document.getElementById('weightSoftRange');
+    var weightNumber = document.getElementById('weightSoftNumber');
+    if (weightRange && weightNumber) {
+        weightRange.addEventListener('input', function() { weightNumber.value = weightRange.value; });
+        weightNumber.addEventListener('input', function() {
+            var v = parseFloat(weightNumber.value) || 0;
+            v = Math.min(30, Math.max(0, v));
+            weightRange.value = v;
+            weightNumber.value = v;
         });
     }
 });

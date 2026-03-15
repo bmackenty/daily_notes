@@ -18,11 +18,19 @@ class PredictedGradeCalculator {
     /**
      * Full calculation for one student.
      * Returns: category_avg, paper1_avg, ia_avg, paper2_avg, final_percent, ib_grade, steps (for display).
+     * Uses student's weight_soft_override if set; otherwise global config.
      */
-    public function calculate($studentId) {
+    public function calculate($studentId, $student = null) {
         $entryModel = new PredictedGradeEntry($this->db);
         $configModel = new PredictedGradeConfig($this->db);
         $weights = $configModel->getWeights();
+        if ($student === null) {
+            $studentModel = new \App\Models\PredictedGradeStudent($this->db);
+            $student = $studentModel->get($studentId);
+        }
+        if ($student && isset($student['weight_soft_override']) && $student['weight_soft_override'] !== null && $student['weight_soft_override'] !== '') {
+            $weights['weight_soft'] = (float) $student['weight_soft_override'];
+        }
         $boundaries = $configModel->getBoundaries();
 
         $categoryAvg = [];

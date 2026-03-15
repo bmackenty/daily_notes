@@ -61,7 +61,7 @@ class PredictedGradeController {
         $entryModel = new PredictedGradeEntry($this->db);
         $entriesByCategory = $entryModel->getEntriesByStudent($studentId);
         $calculator = new PredictedGradeCalculator($this->db);
-        $result = $calculator->calculate($studentId);
+        $result = $calculator->calculate($studentId, $student);
         $showCodeAlert = !empty($_SESSION['predicted_grade_show_code']);
         if ($showCodeAlert) {
             unset($_SESSION['predicted_grade_show_code']);
@@ -151,6 +151,29 @@ class PredictedGradeController {
         if ($id > 0) {
             $entryModel = new PredictedGradeEntry($this->db);
             $entryModel->delete($id, $studentId);
+        }
+        header('Location: /predicted-grade');
+        exit;
+    }
+
+    /**
+     * POST /predicted-grade/save-weight — save student's homework & habits weight override.
+     */
+    public function saveWeight() {
+        $studentId = $_SESSION[self::SESSION_KEY] ?? null;
+        if (!$studentId) {
+            header('Location: /predicted-grade');
+            exit;
+        }
+        $pct = isset($_POST['weight_soft']) ? trim($_POST['weight_soft']) : '';
+        $studentModel = new PredictedGradeStudent($this->db);
+        if ($pct === '' || $pct === null) {
+            $studentModel->setWeightSoftOverride($studentId, null);
+        } else {
+            $value = (float) $pct / 100;
+            if ($value >= 0 && $value <= 0.30) {
+                $studentModel->setWeightSoftOverride($studentId, $value);
+            }
         }
         header('Location: /predicted-grade');
         exit;

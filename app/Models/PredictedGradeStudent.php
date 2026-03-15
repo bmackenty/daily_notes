@@ -62,6 +62,20 @@ class PredictedGradeStudent {
     }
 
     /**
+     * Set homework & habits weight override for this student (0–0.30). Null = use global config.
+     */
+    public function setWeightSoftOverride($studentId, $value) {
+        if ($value === null || $value === '') {
+            $stmt = $this->db->prepare("UPDATE predicted_grade_students SET weight_soft_override = NULL WHERE id = ?");
+            return $stmt->execute([$studentId]);
+        }
+        $v = (float) $value;
+        if ($v < 0 || $v > 0.30) return false;
+        $stmt = $this->db->prepare("UPDATE predicted_grade_students SET weight_soft_override = ? WHERE id = ?");
+        return $stmt->execute([$v, $studentId]);
+    }
+
+    /**
      * Get all students (for admin list).
      * @return array
      */

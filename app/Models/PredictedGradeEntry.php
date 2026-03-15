@@ -45,6 +45,27 @@ class PredictedGradeEntry {
         return $labels[$key] ?? $key;
     }
 
+    /** Unit code (e.g. A1, B2) for display next to topic name. */
+    public static function getCategoryUnitCode($key) {
+        $codes = [
+            'computer_fundamentals' => 'A1',
+            'networks' => 'A2',
+            'databases' => 'A3',
+            'machine_learning' => 'A4',
+            'case_study' => 'A5',
+            'mock_exam' => 'A6',
+            'ia' => 'IA',
+            'programming' => 'B1',
+            'comp_thinking' => 'B2',
+            'oop' => 'B3',
+            'adts' => 'B4',
+            'homework' => null,
+            'study_habits' => null,
+            'independent_coding' => null,
+        ];
+        return $codes[$key] ?? null;
+    }
+
     /**
      * @param int $studentId
      * @return array [category => [entries], ...]
