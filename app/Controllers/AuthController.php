@@ -182,6 +182,7 @@ class AuthController {
             }
 
             // Sanitize and validate input
+            $name = SecurityHelper::sanitizeInput($_POST['name'] ?? '');
             $email = SecurityHelper::sanitizeInput($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
             $confirmPassword = $_POST['confirm_password'] ?? '';
@@ -225,6 +226,7 @@ class AuthController {
             
             // Create new user with hashed password
             $userId = $this->userModel->create([
+                'name' => $name,
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
                 'role' => 'user'
